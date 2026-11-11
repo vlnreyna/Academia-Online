@@ -17,19 +17,24 @@ const cursoSchema = new mongoose.Schema({
     },
     duracionHoras: {
         type: Number,
-        required: true
+        required: true,
+        min: 2
+    },
+    precio: {
+        type: Number,
+        required: true,
+        min: 0
     },
     activo: {
         type: Boolean,
-        required: true
-    },
-    fechaCreacion: {
-        type: Date,
-        required: true
-    },
-    profesor: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Profesor',
-        required: true
+        required: true,
+        default: true
     }
+},
+{
+    timestamps: true,
+    versionKey: false
 });
+
+const Curso = mongoose.model('Curso', cursoSchema);
+module.exports = Curso;
