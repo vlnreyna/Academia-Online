@@ -18,16 +18,20 @@ const register = async (req, res) => {
         const {nombre, apellidos, email, password} = req.body;
 
         if(!nombre || !apellidos || !email || !password) {
-            return res.status(400).json("Debe rellenar todos los datos")
+            return res.status(400).json({
+                message: "Debe rellenar todos los datos"
+            })
         }
 
         const usuarioExiste = await Usuario.findOne({email});
 
         if(usuarioExiste) {
-            return res.status(409).json("El email posee una cuenta")
+            return res.status(409).json({
+                message: "El email posee una cuenta"
+            })
         }
 
-        const passwordEncriptada = await bcrypt.hash(password, 15);
+        const passwordEncriptada = await bcrypt.hash(password, 10);
         
         const usuario = {
             nombre: nombre,
@@ -38,10 +42,15 @@ const register = async (req, res) => {
         const usuarioNuevo = new Usuario(usuario)
         const result = await usuarioNuevo.save();
 
-        return res.status(200).json("Usuario insertado correctamente", result)
+        return res.status(201).json({
+            message: "Usuario insertado correctamente",
+            result
+        })
     } catch (error) {
         console.log("Error al insertar usuario")
-        return res.status(500).json("Error al insertar usuario")
+        return res.status(500).json({
+            message: "Error al insertar usuario"
+        })
     }
 }
 
@@ -58,10 +67,16 @@ const login = async (req, res) => {
 
         const { email, password } = req.body;
         const usuario = await Usuario.findOne({email}).select("+password");
-
+        
         if(!usuario || !(await bcrypt.compare(password, usuario.password))) {
             return res.status(401).json({
                 message: "Credenciales incorrectas"
+            })
+        }
+        
+        if(!usuario.activo) {
+            return res.status(400).json({
+                message: "Este usuario no está activo"
             })
         }
 
@@ -70,14 +85,14 @@ const login = async (req, res) => {
             email: usuario.email,
             rol: usuario.rol
             },
-            process.env.SECRET_PASSWORD,
+            process.env.JWT_PASSWORD,
             { expiresIn: "2h"}
         );
 
         return res.status(200).json({
             message: "Login exitoso",
             token,
-            usario: {
+            usuario: {
                 id: usuario.id,
                 nombre: usuario.nombre,
                 apellidos: usuario.apellidos,
