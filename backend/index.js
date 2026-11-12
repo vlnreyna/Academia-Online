@@ -1,17 +1,21 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-require('dotenv').config();
+const cors = require('cors');
 
+const app = express();
 const rutaUsuarios = require("./routes/usuario.routes")
 const rutaCursos = require("./routes/curso.route")
-const app = express();
+const rutaMatriculas = require("./routes/matricula.route")
 
+app.use(cors({ origin: process.env.FRONTEND_URL }));
 app.use(express.json());
 app.use("/api/usuarios", rutaUsuarios)
-app.use("/api/curso", rutaCursos)
+app.use("/api/cursos", rutaCursos)
+app.use("/api/matriculas", rutaMatriculas)
 
 
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
     console.log("Servidor corriendo en el puerto 3000");
 });
 

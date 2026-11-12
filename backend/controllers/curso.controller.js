@@ -1,5 +1,4 @@
 const Curso = require('../models/curso.model');
-const jwt = require('jsonwebtoken')
 const {validationResult} = require('express-validator')
 require('dotenv').config();
 

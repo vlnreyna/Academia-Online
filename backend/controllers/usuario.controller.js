@@ -85,14 +85,14 @@ const login = async (req, res) => {
             email: usuario.email,
             rol: usuario.rol
             },
-            process.env.SECRET_PASSWORD,
+            process.env.JWT_PASSWORD,
             { expiresIn: "2h"}
         );
 
         return res.status(200).json({
             message: "Login exitoso",
             token,
-            usario: {
+            usuario: {
                 id: usuario.id,
                 nombre: usuario.nombre,
                 apellidos: usuario.apellidos,
