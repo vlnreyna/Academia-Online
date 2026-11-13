@@ -3,16 +3,19 @@ const mongoose = require('mongoose');
 const cursoSchema = new mongoose.Schema({
     nombre: {
         type: String,
-        required: true
+        required: true,
+        minLength: 3
     },
     descripcion: {
         type: String,
-        required: true
+        required: true,
+        minLength: 3
     },
     nivel: {
         type: String,
         required: true,
         trim: true,
+        uppercase: true,
         enum: ['BASICO', 'INTERMEDIO', 'AVANZADO']
     },
     duracionHoras: {
