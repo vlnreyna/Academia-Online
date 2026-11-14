@@ -43,6 +43,30 @@ class matriculaController {
             })
         }
     }
+
+    async desactivarMatricula(req, res) {
+        try {
+            const {matriculaID} = req.body;
+
+            const matricula = await Matricula.findById(matriculaID);
+
+            if(!matricula) return res.status(400).json({message: "Matricula no encontrada"});
+
+            const result = await matricula.updateOne({
+                estado: 'CANCELADA'
+            })
+
+            return res.status(200).json({
+                message: "Matricula cancelada con exito"
+            })
+        } catch(error){
+            console.log("Error al cancelar matricula")
+            return res.status(500).json({
+                message: "Error al cancelar matricula",
+                error: error.message
+            })
+        }
+    }
 }
 
 module.exports = new matriculaController();

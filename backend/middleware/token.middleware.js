@@ -18,7 +18,7 @@ const verificarToken = async (req, res, next) => {
 }
 
 const permitirRol = (rolesPermitidos) => {
-    return (req, res) => {
+    return (req, res, next) => {
         if(!req.usuario || !rolesPermitidos.includes(req.usuario.rol)) {
             return res.status(403).json({message: "No tienes los permisos para cambiar de rol"})
         }
