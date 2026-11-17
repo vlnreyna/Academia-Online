@@ -3,13 +3,23 @@ const jwt = require('jsonwebtoken')
 const verificarToken = async (req, res, next) => {
     const cabecera = req.headers.authorization;
 
-    if(!cabecera) return res.status(401).json({message: "Token no proporcionado"})
+    if(!cabecera || !cabecera.startsWith('Bearer ')) return res.status(401).json({message: "Token no proporcionado"})
 
     const token = cabecera.split(' ')[1];
 
     try {
-        const usuario = jwt.verify(token, process.env.JWT_PASSWORD);
-        req.usuario = usuario;
+        const payload = jwt.verify(token, process.env.JWT_PASSWORD);
+
+        const usuario = await Usuario.findById(payload.id);
+
+        if(!usuario) return res.status(401).json({message: "El usuario no existe"})
+        if(!usuario.activo) return res.status(403).json({message: "Usuario desactivado"})
+
+        req.usuario = {
+            id: usuario.id,
+            email: usuario.email,
+            rol: usuario.rol
+        };
         next();
     } catch( error) {
         console.log("Token invalido");
@@ -20,7 +30,7 @@ const verificarToken = async (req, res, next) => {
 const permitirRol = (rolesPermitidos) => {
     return (req, res, next) => {
         if(!req.usuario || !rolesPermitidos.includes(req.usuario.rol)) {
-            return res.status(403).json({message: "No tienes los permisos para cambiar de rol"})
+            return res.status(403).json({message: "No tienes los permisos necesarios para realizar esta accion"})
         }
         next();
     }
