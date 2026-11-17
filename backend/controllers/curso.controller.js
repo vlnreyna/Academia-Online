@@ -54,6 +54,30 @@ class cursoController {
             });
         }
     }
+
+    async desactivarCurso(req, res) {   
+        try {
+            const {cursoID} = req.body;
+            const curso = await Curso.findById(cursoID);
+
+            if(!curso) return res.status(404).json({message: "Curso no encontrado"})
+
+            const result = await curso.updateOne({
+                activo: false
+            })
+
+            return res.status(200).json({
+                message: "Curso desactivado correctamente",
+                result
+            })
+        } catch (error) {
+            console.log("Error al desactivar curso")
+            return res.status(500).json({
+                message: "Error al desactivar curso",
+                error: error.message
+            })
+        }
+    }
 }
 
 module.exports = new cursoController();
