@@ -17,13 +17,6 @@ class usuarioController {
             }
 
             const {nombre, apellidos, email, password} = req.body;
-
-            if(!nombre || !apellidos || !email || !password) {
-                return res.status(400).json({
-                    message: "Debe rellenar todos los datos"
-                })
-            }
-
             const usuarioExiste = await Usuario.findOne({email});
 
             if(usuarioExiste) {
@@ -41,16 +34,23 @@ class usuarioController {
                 password: passwordEncriptada
             }
             const usuarioNuevo = new Usuario(usuario)
-            const result = await usuarioNuevo.save();
+            await usuarioNuevo.save();
 
             return res.status(201).json({
                 message: "Usuario insertado correctamente",
-                result
+                usuario: {
+                    id: usuarioNuevo.id,
+                    nombre,
+                    apellidos,
+                    email,
+                    rol: usuarioNuevo.rol
+                }
             })
         } catch (error) {
             console.log("Error al insertar usuario")
             return res.status(500).json({
-                message: "Error al insertar usuario"
+                message: "Error al insertar usuario",
+                error: error.message
             })
         }
     }
@@ -76,7 +76,7 @@ class usuarioController {
             }
             
             if(!usuario.activo) {
-                return res.status(400).json({
+                return res.status(403).json({
                     message: "Este usuario no está activo"
                 })
             }
@@ -121,7 +121,7 @@ class usuarioController {
             const {usuarioID, rol} = req.body;
 
             if(!usuarioID || !rol) return res.status(400).json({message: "No ha escrito los parametros"})
-            if(usuarioID === req.usuario.id) return res.status(400).json({message: "No puedes cambiar tu propio rol"})
+            if(usuarioID == req.usuario.id) return res.status(400).json({message: "No puedes cambiar tu propio rol"})
 
             const usuario = await Usuario.findById(usuarioID)
             
@@ -148,9 +148,12 @@ class usuarioController {
         try {
             const {usuarioID} = req.body;
 
-            if(!usuarioID) return res.status(400).json({message: "No ha escrito el ID del usuario"})
+            if(!usuarioID) return res.status(400).json({message: "No ha escrito el ID del usuario"});
             
             const usuario = await Usuario.findById(usuarioID)
+            
+            if(!usuario) return res.status(404).json({message: "No existe el usuario"});
+            
             const result = await usuario.updateOne({
                 activo: false
             })
@@ -162,6 +165,154 @@ class usuarioController {
         } catch (error) {
             console.log("Error al desactivar usuario");
             return res.status(500).json({message: "Error al desactivar usuario"})
+        }
+    }
+
+    async activarUsuario(req, res) {
+        try {
+            const {usuarioID} = req.body;
+
+            if(!usuarioID) return res.status(400).json({message: "No ha escrito el ID del usuario"});
+            
+            const usuario = await Usuario.findById(usuarioID)
+
+            if(!usuario) return res.status(404).json({message: "No existe el usuario"});
+            const result = await usuario.updateOne({
+                activo: true
+            })
+
+            return res.status(200).json({
+                message: "Usuario activado correctamente",
+                result
+            })
+        } catch (error) {
+            console.log("Error al activar usuario");
+            return res.status(500).json({message: "Error al activar usuario"})
+        }
+    }
+    
+
+    async obtenerPerfil(req, res) {
+        try {
+            const usuarioID = req.usuario.id;
+            const usuario = await Usuario.findById(usuarioID);
+
+            return res.status(200).json({
+                message: "Datos de usuario obtenidos",
+                usuario: {
+                    id: usuario.id,
+                    nombre: usuario.nombre,
+                    apellidos: usuario.apellidos,
+                    email: usuario.email,
+                    rol: usuario.rol
+                }
+            })
+        } catch(error) {
+            console.log("Error al extraer datos del usuario")
+            return res.status(500).json({
+                message: "Error al extraer datos del usuario",
+                error: error.message
+            })
+        }
+    }
+
+    async editarPerfil(req, res) {
+        try {
+            const errores = validationResult(req);
+            if(!errores.isEmpty) return res.status(400).json({
+                message: "Error de validacion",
+                error: errores.array()
+            })
+
+            const usuarioID = req.usuario.id;
+            const usuario = await Usuario.findById(usuarioID);
+
+            const {nombre, apellidos} = req.body;
+            const result = await usuario.updateOne({
+                nombre: nombre,
+                apellidos: apellidos
+            })
+
+            return res.status(200).json({
+                message: "Datos de usuario cambiados correctamente",
+                result
+            })
+        } catch(error) {
+            console.log("Error al cambiar los datos de usuario");
+            return res.status(500).json({
+                message: "Error al cambiar los datos de usuario",
+                error: error.message
+            })
+        }
+    }
+
+    async cambiarPassword(req, res) {
+        try {
+
+            const errores = validationResult(req);
+            if(!errores.isEmpty) return res.status(404).json({
+                message: "Error de validacion",
+                error: errores.array()
+            })
+
+            const usuarioID = req.usuario.id;
+            const usuario = await Usuario.findById(usuarioID).select("+password");
+
+            const {passwordActual, passwordNueva} = req.body;
+
+            if(!passwordActual) return res.status(400).json({message: "No ha insertado la contraseña actual"});
+            
+            const correcto = await bcrypt.compare(passwordActual, usuario.password);
+            
+            if(!correcto) return res.status(400).json({message: "La contraseña no es correcta"});
+            if(!passwordNueva) return res.status(400).json({message: "No ha insertado la contraseña nueva"});
+            if(passwordActual == passwordNueva) return res.status(400).json({message: "La contraseña nueva no puede ser igual que la anterior"});
+
+            usuario.password = await bcrypt.hash(passwordNueva, 10);
+            const result = await usuario.save();
+
+            return res.status(200).json({
+                message: "Contraseña cambiada correctamente",
+                result
+            })
+        } catch(error){
+            console.log("Error al cambiar la contraseña");
+            return res.status(500).json({
+                message: "Error al cambiar la contraseña",
+                error: error.message
+            })
+        }
+    }
+
+    async listarAlumnos(req,res) {
+        try {
+            const alumnos = await Usuario.find({rol: "ALUMNO"});
+            return res.status(200).json({
+                message: "Todos los alumnos",
+                alumnos
+            })
+        } catch(error) {
+            console.log("Error al mostrar alumnos");
+            return res.status(500).json({
+                message : "Error al mostrar alumnos",
+                error: error.message
+            })
+        }
+    }
+
+    async listarAgentes(req,res) {
+        try {
+            const agentes = await Usuario.find({rol: "AGENTE"});
+            return res.status(200).json({
+                message: "Todos los agentes",
+                agentes
+            })
+        } catch(error) {
+            console.log("Error al mostrar agentes");
+            return res.status(500).json({
+                message : "Error al mostrar agentes",
+                error: error.message
+            })
         }
     }
 }

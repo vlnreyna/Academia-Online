@@ -60,9 +60,9 @@ class matriculaController {
                 message: "Matricula cancelada con exito"
             })
         } catch(error){
-            console.log("Error al cancelar matricula")
+            console.log("Error al cancelar la matricula")
             return res.status(500).json({
-                message: "Error al cancelar matricula",
+                message: "Error al cancelar la matricula",
                 error: error.message
             })
         }
