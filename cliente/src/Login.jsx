@@ -1,53 +1,53 @@
-import { useState } from 'react'
+import React, {useState} from 'react'
 
-const API = import.meta.env.VITE_API_URL
+export default function Login() {
 
-function Login() {
+    //Creo una propiedad que va a estar asociado el cambio de estado
+    //const [text, setText] = useState('')
+
+
+    //Creo la propiedad Email
     const [email, setEmail] = useState('')
+
     const [password, setPassword] = useState('')
-    const [mensaje, setMensaje] = useState('')
 
-    const enviar = async (e) => {
-        e.preventDefault()
+    const [updated, setUpdated] = useState('')
 
-        const rpta = await fetch(API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        })
-        
-        const datos = await rpta.json()
+    // Va a llamar a la actualizacion de estado
+    // Con lo que tenga el Event, el Target y en Value
+    /*const textOnChange = (event) => {
+        setText(event.target.value)
+    }*/
 
-        if (rpta.ok) {
-            setMensaje('Bienvenido ' + datos.usuario.nombre)
-        } else {
-            setMensaje(datos.mensaje)
-        }
+
+    //Aqui va a llamar al Email
+    const emailOnChange = (event) =>{
+        setEmail(event.target.value)
     }
 
-    return (
-        <form onSubmit={enviar}>
-            <h1>Login</h1>
+    //Aqui voy a llamar a PassWord
+    const passwordOnChange = (event) => {
+        setPassword(event.target.value)
+    }
 
-            <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-
-            <input
-                type="password"
-                placeholder="Contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-            />
-
-            <button type="submit">Entrar</button>
-
-            <p>{mensaje}</p>
-        </form>
+    const buttonOnClick = (event) =>{
+        event.preventDefault()
+        setUpdated(email)
+    }
+  return (
+    <from>
+        <div>
+            <label htmlFor="email">Email:</label>
+            <input type='email' value={email} onChange={emailOnChange}/>
+        </div>
+        
+        <div>
+            <label htmlFor="password">Password:</label>
+            <input type='password' value={password} onChange={passwordOnChange} />
+        </div>
+        <button onClick={buttonOnClick}>Iniciar Sesion</button>
+    </from>
   )
 }
 
-export default Login
+
