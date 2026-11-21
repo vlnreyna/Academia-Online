@@ -1,6 +1,8 @@
 const { validationResult } = require('express-validator');
 const Ticket = require('../models/ticket.model');
 const Usuario = require('../models/usuario.model');
+const Categoria = require('../models/categoria.model');
+const Respuesta = require('../models/respuesta.model');
 
 const TRANSICIONES = {
     AGENTE: {
