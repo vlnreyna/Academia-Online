@@ -1,28 +1,19 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import './App.css';
-import Login from './Login';
-import SingUp from './SingUp';
-import Navbar from './Navbar';
+import { useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Login from './Login'
+import SignUp from './SignUp'
 
-function App() {
+export default function App() {
+    const [usuario, setUsuario] = useState(null)
 
-  const [vista, setVista] = useState('login')
-
-  return (
-      <div className='App'>
-        <Navbar vista={vista} setVista={setVista} />
-        <main className='App-main'>
-          <div className='card'>
-            <img src={reactLogo} className='App-logo' alt="logo"/>
-            <h1 className='card-title'>
-              {vista === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}
-            </h1>
-            {vista === 'login' ? <Login/> : <SingUp/>}
-          </div>
-        </main>
-      </div>
-  );
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/login" element={<Login onLogin={setUsuario} />} />
+                <Route path="/registro" element={<SignUp />} />
+                <Route path="/" element={usuario ? <h1>Hola, {usuario.nombre}</h1> : <Navigate to="/login" />} />
+                <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+        </BrowserRouter>
+    )
 }
-
-export default App;
