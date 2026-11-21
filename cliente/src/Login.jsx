@@ -1,53 +1,120 @@
-import React, {useState} from 'react'
+import { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { API_URL, EMAIL_REGEX } from './Config'
+import './Auth.css'
 
-export default function Login() {
-
-    //Creo una propiedad que va a estar asociado el cambio de estado
-    //const [text, setText] = useState('')
-
-
-    //Creo la propiedad Email
-    const [email, setEmail] = useState('')
-
+export default function Login({ onLogin }) {
+    const location = useLocation()
+    const navigate = useNavigate()
+    const [paso, setPaso] = useState(1)
+    const [email, setEmail] = useState(location.state?.email ?? '')
     const [password, setPassword] = useState('')
+    const [error, setError] = useState('')
+    const [cargando, setCargando] = useState(false)
+    const aviso = location.state?.registrado ? 'Cuenta creada. Ya puedes iniciar sesión.' : ''
 
-    const [updated, setUpdated] = useState('')
-
-    // Va a llamar a la actualizacion de estado
-    // Con lo que tenga el Event, el Target y en Value
-    /*const textOnChange = (event) => {
-        setText(event.target.value)
-    }*/
-
-
-    //Aqui va a llamar al Email
-    const emailOnChange = (event) =>{
-        setEmail(event.target.value)
-    }
-
-    //Aqui voy a llamar a PassWord
-    const passwordOnChange = (event) => {
-        setPassword(event.target.value)
-    }
-
-    const buttonOnClick = (event) =>{
+    const handleSiguiente = (event) => {
         event.preventDefault()
-        setUpdated(email)
+        if (!EMAIL_REGEX.test(email.trim())) {
+            setError('Escribe un correo electrónico válido')
+            return
+        }
+        setError('')
+        setPaso(2)
     }
-  return (
-    <from>
-        <div>
-            <label htmlFor="email">Email:</label>
-            <input type='email' value={email} onChange={emailOnChange}/>
-        </div>
-        
-        <div>
-            <label htmlFor="password">Password:</label>
-            <input type='password' value={password} onChange={passwordOnChange} />
-        </div>
-        <button onClick={buttonOnClick}>Iniciar Sesion</button>
-    </from>
-  )
-}
 
+    const handleAtras = () => {
+        setPaso(1)
+        setPassword('')
+        setError('')
+    }
+
+    const handleIniciarSesion = async (event) => {
+        event.preventDefault()
+        if (password === '') {
+            setError('Escribe tu contraseña')
+            return
+        }
+        setError('')
+        setCargando(true)
+        try {
+            const respuesta = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.trim(), password })
+            })
+            const datos = await respuesta.json()
+            if (!respuesta.ok) {
+                setError(datos.message || 'Correo o contraseña incorrectos')
+                return
+            }
+            localStorage.setItem('token', datos.token)
+            onLogin(datos.usuario)
+            navigate('/')
+        } catch {
+            setError('No se pudo conectar con el servidor')
+        } finally {
+            setCargando(false)
+        }
+    }
+
+    return (
+        <div className="auth-pagina">
+            <div className="auth-tarjeta">
+                <div className="auth-logo">
+                    <span className="auth-logo-icono"></span>
+                    Academia Online
+                </div>
+
+                {paso === 1 ? (
+                    <form onSubmit={handleSiguiente} noValidate>
+                        <h1 className="auth-titulo">Iniciar sesión</h1>
+                        {aviso && <p className="auth-aviso">{aviso}</p>}
+                        {error && <p className="auth-error">{error}</p>}
+                        <input
+                            className="auth-input"
+                            type="email"
+                            placeholder="Correo electrónico"
+                            aria-label="Correo electrónico"
+                            value={email}
+                            onChange={(event) => setEmail(event.target.value)}
+                            autoFocus
+                        />
+                        <p className="auth-texto">
+                            ¿No tienes una cuenta? <Link to="/registro">Crea una.</Link>
+                        </p>
+                        <div className="auth-botones">
+                            <button type="submit" className="auth-boton auth-boton-principal">
+                                Siguiente
+                            </button>
+                        </div>
+                    </form>
+                ) : (
+                    <form onSubmit={handleIniciarSesion}>
+                        <p className="auth-identidad">{email.trim()}</p>
+                        <h1 className="auth-titulo">Escribir contraseña</h1>
+                        {error && <p className="auth-error">{error}</p>}
+                        <input
+                            className="auth-input"
+                            type="password"
+                            placeholder="Contraseña"
+                            aria-label="Contraseña"
+                            value={password}
+                            onChange={(event) => setPassword(event.target.value)}
+                            autoFocus
+                        />
+                        <div className="auth-botones">
+                            <button type="button" className="auth-boton auth-boton-secundario" onClick={handleAtras}>
+                                Atrás
+                            </button>
+                            <button type="submit" className="auth-boton auth-boton-principal" disabled={cargando}>
+                                {cargando ? 'Entrando...' : 'Iniciar sesión'}
+                            </button>
+                        </div>
+                    </form>
+                )}
+            </div>
+        </div>
+    )
+}
 

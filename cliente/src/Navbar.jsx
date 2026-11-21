@@ -6,18 +6,26 @@ export default function Navbar({ vista, setVista }) {
     <nav className='navbar'>
       <span className='navbar-brand'>Academia Online</span>
       <div className='navbar-links'>
-        <button
-          className={vista === 'login' ? 'navbar-link activo' : 'navbar-link'}
-          onClick={() => setVista('login')}
-        >
-          Login
-        </button>
-        <button
-          className={vista === 'signup' ? 'navbar-link activo' : 'navbar-link'}
-          onClick={() => setVista('signup')}
-        >
-          Sign Up
-        </button>
+        {vista === 'home' ? (
+          <button className='navbar-link' onClick={() => setVista('login')}>
+            Cerrar sesión
+          </button>
+        ) : (
+          <>
+            <button
+              className={vista === 'login' ? 'navbar-link activo' : 'navbar-link'}
+              onClick={() => setVista('login')}
+            >
+              Login
+            </button>
+            <button
+              className={vista === 'signup' ? 'navbar-link activo' : 'navbar-link'}
+              onClick={() => setVista('signup')}
+            >
+              Sign Up
+            </button>
+          </>
+        )}
       </div>
     </nav>
   )
