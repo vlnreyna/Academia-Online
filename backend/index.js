@@ -14,9 +14,8 @@ app.use("/api/usuarios", rutaUsuarios)
 app.use("/api/cursos", rutaCursos)
 app.use("/api/matriculas", rutaMatriculas)
 
-
 app.listen(process.env.PORT, () => {
-    console.log("Servidor corriendo en el puerto 3000");
+    console.log("Servidor corriendo");
 });
 
 mongoose.connect(process.env.MONGODB)
