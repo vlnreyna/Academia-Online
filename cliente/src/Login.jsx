@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { API_URL, EMAIL_REGEX } from './Config'
-import './Auth.css'
+import './Login.css'
 
 export default function Login({ onLogin }) {
     const location = useLocation()

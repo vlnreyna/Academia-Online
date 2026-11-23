@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './Login'
-import SignUp from './SignUp'
+import SignUp from './SingUp'
 
 export default function App() {
     const [usuario, setUsuario] = useState(null)

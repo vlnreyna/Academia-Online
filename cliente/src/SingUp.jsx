@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { API_URL, EMAIL_REGEX } from './Config'
-import './Auth.css'
+import { EMAIL_REGEX } from './Config'
+import { post } from './api'
+import './SingUp.css'
 
 export default function SignUp() {
     const navigate = useNavigate()
-    const [form, setForm] = useState({ nombre: '', email: '', password: '', confirmar: '' })
+    const [form, setForm] = useState({ nombre: '', apellido: '', email: '', password: '', confirmar: '' })
     const [error, setError] = useState('')
     const [cargando, setCargando] = useState(false)
 
@@ -15,6 +16,7 @@ export default function SignUp() {
 
     const validar = () => {
         if (form.nombre.trim() === '') return 'Escribe tu nombre'
+        if (form.apellido.trim() === '') return 'Escribe tu apellido'
         if (!EMAIL_REGEX.test(form.email.trim())) return 'Escribe un correo electrónico válido'
         if (form.password.length < 8) return 'La contraseña debe tener al menos 8 caracteres'
         if (form.password !== form.confirmar) return 'Las contraseñas no coinciden'
@@ -31,23 +33,15 @@ export default function SignUp() {
         setError('')
         setCargando(true)
         try {
-            const respuesta = await fetch(`${API_URL}/registro`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nombre: form.nombre.trim(),
-                    email: form.email.trim(),
-                    password: form.password
-                })
+            await post('/usuarios/register', {
+                nombre: form.nombre.trim(),
+                apellidos: form.apellido.trim(),
+                email: form.email.trim(),
+                password: form.password
             })
-            const datos = await respuesta.json()
-            if (!respuesta.ok) {
-                setError(datos.message || 'No se pudo crear la cuenta')
-                return
-            }
             navigate('/login', { state: { email: form.email.trim(), registrado: true } })
-        } catch {
-            setError('No se pudo conectar con el servidor')
+        } catch (error) {
+            setError(error.message)
         } finally {
             setCargando(false)
         }
@@ -72,6 +66,14 @@ export default function SignUp() {
                         value={form.nombre}
                         onChange={handleChange}
                         autoFocus
+                    />
+                    <input
+                        className="auth-input"
+                        name="apellido"
+                        placeholder="Apellido"
+                        aria-label="Apellido"
+                        value={form.apellido}
+                        onChange={handleChange}
                     />
                     <input
                         className="auth-input"
