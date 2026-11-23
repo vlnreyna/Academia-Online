@@ -1,0 +1,143 @@
+.home {
+  --rosa: #ed9dd0;
+  --rosa-suave: #fbe3f1;
+  --rosa-texto: #9c2f69;
+  --texto: #1d1d1f;
+  --texto-suave: #55505a;
+  --fondo: #fff7fb;
+  --blanco: #ffffff;
+  --borde: #f0c9e1;
+  --ok: #2f7d4f;
+  --radio: 14px;
+
+  min-height: 100vh;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: system-ui, sans-serif;
+}
+
+.home :focus-visible {
+  outline: 3px solid var(--rosa-texto);
+  outline-offset: 2px;
+}
+
+/* Cabecera */
+.home-hero {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 3rem 2rem 2rem;
+  display: grid;
+  gap: 1rem;
+  justify-items: start;
+}
+.home-hero h1 {
+  margin: 0;
+  color: var(--rosa);
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  line-height: 1.1;
+}
+.home-subtitulo { margin: 0; color: var(--texto-suave); font-size: 1.1rem; }
+
+.home-acciones {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+/* Contenido */
+.home-contenido {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1rem 2rem 3rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.home-titulo-seccion { margin: 0 0 0.9rem; font-size: 1.2rem; }
+.home h2 { color: var(--texto); }
+
+.bloque {
+  background: var(--blanco);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.25rem;
+}
+
+.texto { margin: 0 0 0.8rem; line-height: 1.6; }
+
+/* Botones */
+.home .btn {
+  display: inline-block;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+}
+.home .btn-primary { background: var(--rosa); color: var(--texto); }
+.home .btn-primary:hover { background: #e689c4; }
+.home .btn-secundario { background: transparent; color: var(--rosa-texto); border-color: var(--rosa); }
+.home .btn-secundario:hover { background: var(--rosa-suave); }
+
+/* Preguntas frecuentes */
+.faq-item {
+  border-top: 1px solid var(--borde);
+  padding: 0.8rem 0;
+}
+.faq-item:last-child { border-bottom: 1px solid var(--borde); }
+.faq-item summary {
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--rosa-texto);
+}
+.faq-item p { margin: 0.6rem 0 0; }
+
+@media (max-width: 600px) {
+  .home-hero { padding: 2rem 1rem 1.5rem; }
+  .home-contenido { padding: 1rem 1rem 2rem; }
+}
+/* Añadidos: tarjetas de accesos, logo y vista de tickets */
+.home-hero {
+  text-align: center;
+  justify-items: center;
+}
+.home-logo {
+  width: 150px;
+  height: auto;
+}
+.home-accesos {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.tarjeta {
+  background: var(--blanco);
+  border: 2px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.25rem;
+}
+.tarjeta h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  color: var(--rosa-texto);
+}
+.tarjeta p {
+  margin: 0;
+  color: var(--texto-suave);
+}
+.home-volver {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem 0;
+}
+@media (max-width: 600px) {
+  .home-accesos {
+    padding: 0 1rem;
+  }
+}
