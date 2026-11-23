@@ -1,18 +1,18 @@
 .counter {
   font-size: 16px;
   padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
+  border-radius: 2px;
+  color: #eef0f2;
+  background: rgba(43, 106, 142, 0.18);
+  border: 1px solid rgba(199, 202, 208, 0.3);
   transition: border-color 0.3s;
   margin-bottom: 24px;
 
   &:hover {
-    border-color: var(--accent-border);
+    border-color: rgba(238, 240, 242, 0.6);
   }
   &:focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid #eef0f2;
     outline-offset: 2px;
   }
 }
@@ -116,23 +116,25 @@
   }
 
   a {
-    color: var(--text-h);
+    color: var(--ysl-plata-claro);
     font-size: 16px;
-    border-radius: 6px;
+    border-radius: 2px;
     background: var(--social-bg);
+    border: 1px solid var(--ysl-borde);
     display: flex;
     padding: 6px 12px;
     align-items: center;
     gap: 8px;
     text-decoration: none;
-    transition: box-shadow 0.3s;
+    transition: border-color 0.3s;
 
     &:hover {
-      box-shadow: var(--shadow);
+      border-color: var(--ysl-borde-fuerte);
     }
     .button-icon {
       height: 18px;
       width: 18px;
+      filter: grayscale(1) brightness(1.4);
     }
   }
 
@@ -184,7 +186,7 @@
 }
 
 .error {
-  color: #ff6b61;
+  color: var(--ysl-error);
   font-size: 0.9rem;
   margin: 0;
 }
