@@ -20,4 +20,4 @@ app.listen(process.env.PORT, () => {
 
 mongoose.connect(process.env.MONGODB)
 .then(() => console.log("Conexión a la base de datos establecida"))
-.catch(() => console.log("La conexión a la base de datos ha fallado"))
+.catch((error) => console.log("La conexión a la base de datos ha fallado", error.message))

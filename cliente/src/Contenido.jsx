@@ -3,7 +3,8 @@ import './Contenido.css'
 const asignaturas = [
     {id: 1, nombre: 'Matematicas', descripcion: 'Algebra, Geometría y Estadistica', icono: '📐'},
     {id: 2, nombre: 'Lengua', descripcion: 'Gramatica, Ortografia y Literatura', icono: '📖'},
-    {id: 3, nombre: 'Ingles', descripcion: 'Vocabulario, Gramatica y Listening', icono: '🗣️'}
+    {id: 3, nombre: 'Ingles', descripcion: 'Vocabulario, Gramatica y Listening', icono: '🗣️'},
+    {id: 4, nombre: 'Historia', descripcion: 'Etapas Historicas, Dimesiones de Análisis y Metodología', icono: '👴👵'}
 ]
 
 export default function Home(){
