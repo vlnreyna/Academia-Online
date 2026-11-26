@@ -1,31 +1,15 @@
-const { validationResult } = require('express-validator');
+const { comprobarErrores } = require('../middleware/validacion.middleware');
 const Categoria = require('../models/categoria.model');
 
-const comprobarErrores = (req, res) => {
-    const errores = validationResult(req);
-
-    if(!errores.isEmpty()) {
-        res.status(400).json({
-            message: "Error de validacion",
-            error: errores.array()
-        });
-        return true;
-    }
-
-    return false;
-}
 
 class categoriaController {
     async listarCategorias(req, res) {
         try {
-            let filtro = {};
+            const filtro = {};
 
             if(req.usuario.rol !== 'ADMIN') {
                 filtro.activa = true
             }
-            
-            const categoriaID = req.params.id
-            if (categoriaID) filtro.categoriaID = categoriaID;
 
             const result = await Categoria.find(filtro);
 
@@ -37,6 +21,28 @@ class categoriaController {
             console.log("Error al listar las categorias");
             return res.status(500).json({
                 message: "Error al listar las categorias",
+                error: error.message
+            })
+        }
+    }
+
+    async obtenerCategoria(req, res) {
+        try {
+            if(comprobarErrores(req, res)) return;
+
+            const categoria = await Categoria.findById(req.params.id);
+            if(!categoria || (!categoria.activa && req.usuario.rol !== 'ADMIN')) {
+                return res.status(404).json({message: "Categoria no encontrada"});
+            }
+
+            return res.status(200).json({
+                message: "Categoria",
+                result: categoria
+            })
+        } catch(error) {
+            console.log("Error al obtener la categoria");
+            return res.status(500).json({
+                message: "Error al obtener la categoria",
                 error: error.message
             })
         }
