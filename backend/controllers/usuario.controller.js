@@ -1,7 +1,7 @@
 const Usuario = require('../models/usuario.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
-const {validationResult} = require('express-validator')
+const { comprobarErrores } = require('../middleware/validacion.middleware');
 require('dotenv').config();
 
 const datosPublicos = (usuario) => ({
@@ -13,21 +13,6 @@ const datosPublicos = (usuario) => ({
     activo: usuario.activo
 });
 
-
-const comprobarErrores = (req, res) => {
-    const errores = validationResult(req);
-
-    if(!errores.isEmpty()) {
-        res.status(400).json({
-            message: "Error de validacion",
-            errores: errores.array()
-        });
-        return true;
-    }
-
-    return false;
-}
-
 const cargarUsuario = async (req, res) => {
     const usuario = await Usuario.findById(req.usuario.id);
     if(!usuario) {
@@ -35,6 +20,41 @@ const cargarUsuario = async (req, res) => {
         return null;
     }
     return usuario
+}
+
+const actualizarEstado = async (req, res, activo) => {
+    try {
+        if(comprobarErrores(req, res)) return;
+
+        const usuarioID = req.params.id;
+        if(usuarioID === req.usuario.id) {
+            return res.status(400).json({message: "No puedes cambiar el estado de tu propia cuenta"})
+        }
+
+        const usuario = await Usuario.findById(usuarioID);
+        if(!usuario) return res.status(404).json({message: "Usuario no encontrado"});
+
+        usuario.activo = activo;
+        await usuario.save();
+
+        const mensaje = ""
+        if(activo) {
+            mensaje = "Usuario activado correctamente"
+        } else {
+            mensaje = "Usuario desactivado correctamente"
+        }
+
+        return res.status(200).json({
+            message: mensaje,
+            usuario: datosPublicos(usuario)
+        })
+    } catch(error) {
+        console.log("Error al cambiar estado del usuario");
+        return res.status(500).json({
+            message: "Error al cambiar estado del usuario",
+            error: error.message
+        })
+    }
 }
 
 class usuarioController {
@@ -123,7 +143,6 @@ class usuarioController {
 
             const {usuarioID, rol} = req.body;
 
-            if(!usuarioID || !rol) return res.status(400).json({message: "No ha escrito los parametros"})
             if(usuarioID == req.usuario.id) return res.status(400).json({message: "No puedes cambiar tu propio rol"})
 
             const usuario = await Usuario.findById(usuarioID)
@@ -145,36 +164,17 @@ class usuarioController {
         }
     }
 
-    async cambiarEstado(req, res) {
-        try {
-            if(comprobarErrores(req, res)) return;
+    async desactivarUsuario(req, res) {
+        return actualizarEstado(req, res, false);
+    }
 
-            const usuarioID = req.params.id;
-
-            const usuario = await Usuario.findById(usuarioID);
-            if(!usuario) return res.status(404).json({message: "Usuario no encontrado"});
-            
-            usuario.activo = !usuario.activo;
-            await usuario.save();
-
-            return res.status(200).json({
-                message: "Estado del usuario cambiado correctamente",
-                usuario: datosPublicos(usuario)
-            })
-        } catch(error) {
-            console.log("Error al cambiar estado del usuario");
-            return res.status(500).json({
-                message: "Error al cambiar estado del usuario",
-                error: error.message
-            })
-        }
+    async activarUsuario(req, res) {
+        return actualizarEstado(req, res, true);
     }
     
 
     async obtenerPerfil(req, res) {
-        try {
-            if(comprobarErrores(req, res)) return;
-            
+        try {            
             const usuario = await cargarUsuario(req, res);
 
             return res.status(200).json({
@@ -190,39 +190,47 @@ class usuarioController {
         }
     }
 
-    
-
     async editarPerfil(req, res) {
-    try {
-        if(comprobarErrores(req, res)) return;
+        try {
+            if(comprobarErrores(req, res)) return;
 
-        const usuario = await cargarUsuario(req, res);
+            const usuario = await cargarUsuario(req, res);
 
-        const { nombre, apellidos, email } = req.body;
+            const { nombre, apellidos, email } = req.body;
 
-        const datosActualizar = {};
+            const datosActualizar = {};
 
-        if(nombre !== undefined) datosActualizar.nombre = nombre;
-        if(apellidos !== undefined) datosActualizar.apellidos = apellidos;
-        if(email !== undefined) datosActualizar.email = email;
+            if(nombre !== undefined) datosActualizar.nombre = nombre;
+            if(apellidos !== undefined) datosActualizar.apellidos = apellidos;
+            
+            if(email !== undefined) {
+                if(email !== usuario.email) {
+                    const usuarioEmail = await Usuario.find(email)
+                    if(usuarioEmail) {
+                        return res.status(409).json({message: "El email ya pertenece a otra cuenta"})
+                    }
+                } else {
+                    return res.status(409).json("No puedes poner el mismo email")
+                }
+            }
 
-        const result = await usuario.updateOne(
-            { $set: datosActualizar }
-        );
+            if(email !== undefined) usuario.email = email;
 
-        return res.status(200).json({
-            message: "Datos de usuario cambiados correctamente",
-            usuario: datosPublicos(result)
-        });
+            await usuario.save();
 
-    } catch(error) {
-        console.log("Error al cambiar los datos de usuario");
-        return res.status(500).json({
-            message: "Error al cambiar los datos de usuario",
-            error: error.message
-        });
+            return res.status(200).json({
+                message: "Datos de usuario cambiados correctamente",
+                usuario: datosPublicos(usuario)
+            });
+
+        } catch(error) {
+            console.log("Error al cambiar los datos de usuario");
+            return res.status(500).json({
+                message: "Error al cambiar los datos de usuario",
+                error: error.message
+            });
+        }
     }
-}
 
     async cambiarPassword(req, res) {
         try {
@@ -255,8 +263,6 @@ class usuarioController {
 
     async listarAlumnos(req,res) {
         try {
-            if(comprobarErrores(req, res)) return;
-
             const alumnos = await Usuario.find({rol: "ALUMNO"});
             return res.status(200).json({
                 message: "Todos los alumnos",
@@ -273,8 +279,6 @@ class usuarioController {
 
     async listarAgentes(req,res) {
         try {
-            if(comprobarErrores(req, res)) return;
-
             const agentes = await Usuario.find({rol: "AGENTE"});
             return res.status(200).json({
                 message: "Todos los agentes",

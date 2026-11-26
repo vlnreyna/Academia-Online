@@ -1,8 +1,11 @@
-const { body } = require('express-validator');
+const { body, param, query } = require('express-validator');
 
+const NIVELES = ['BASICO', 'INTERMEDIO', 'AVANZADO'];
 const idCurso = param('id').isMongoId().withMessage('El id del curso no es valido')
 
 class cursoValidator {
+    validarId = [idCurso];
+    
     validarCrearCurso = [
         body('nombre')
         .trim()
@@ -35,6 +38,26 @@ class cursoValidator {
         .withMessage('El precio debe ser un numero')
     ];
 
+    validarListarCursos = [
+        idCurso, 
+        query('nombre')
+            .optional()
+            .trim()
+            .isLength({ max: 50 })
+            .withMessage('La busqueda no puede superar los 50 caracteres'),
+
+        query('nivel')
+            .optional()
+            .trim()
+            .toUpperCase()
+            .isIn(NIVELES)
+            .withMessage('El nivel debe ser BASICO, INTERMEDIO o AVANZADO'),
+        
+        query('activo')
+            .optional()
+            .isBoolean().withMessage("Debe ser true o false")
+    ];
+
     validarActualizarCurso = [
         idCurso,
 
@@ -47,28 +70,27 @@ class cursoValidator {
         body('descripcion')
             .optional()
             .trim()
-            .isLength({ max: 200 })
-            .withMessage('La descripcion no puede superar los 200 caracteres'),
+            .isLength({ min: 3, max: 200 })
+            .withMessage('La descripcion debe tener entre 3 y 200 caracteres'),
 
         body('nivel')
             .optional()
             .trim()
-            .isIn(['BASICO', 'INTERMEDIO', 'AVANZADO'])
+            .toUpperCase()
+            .isIn(NIVELES)
             .withMessage('El nivel debe ser BASICO, INTERMEDIO o AVANZADO'),
 
         body('duracionHoras')
             .optional()
-            .isInt({ min: 1 })
-            .withMessage('La duracion debe ser un numero entero mayor que 0'),
+            .isInt({ min: 2 })
+            .withMessage('La duracion debe ser un numero entero de al menos 2 horas')
+            .toInt(),
 
         body('precio')
             .optional()
             .isFloat({ min: 0 })
             .withMessage('El precio debe ser un numero mayor o igual a 0')
-    ];
-
-    validarCambiarEstado = [
-        idCurso
+            .toFloat()
     ];
 }
 

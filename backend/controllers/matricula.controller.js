@@ -1,21 +1,7 @@
 const Matricula = require('../models/matricula.model')
 const Usuario = require('../models/usuario.model')
 const Curso = require('../models/curso.model')
-const {validationResult} = require('express-validator');
-
-const comprobarErrores = (req, res) => {
-    const errores = validationResult(req);
-
-    if(!errores.isEmpty()) {
-        res.status(400).json({
-            message: "Error de validacion",
-            errores: errores.array()
-        });
-        return true;
-    }
-
-    return false;
-}
+const { comprobarErrores } = require('../middleware/validacion.middleware');
 
 const cargarMatricula = async (req, res) => {
     const matricula = await Matricula.findById(req.params.id);
@@ -36,23 +22,27 @@ class matriculaController {
             const curso = await Curso.findById(cursoID)
             if(!curso) {
                 return res.status(404).json({
-                    message: "Coche no encontrado"
+                    message: "Curso no encontrado"
                 })
             }
 
-            const alumno = await Usuario.findById(usuarioID)
-            if(!alumno) {
+            const usuario = await Usuario.findById(usuarioID)
+            if(!usuario) {
                 return res.status(404).json({
                     message: "Usuario no encontrado"
                 })
             }
 
-            const matriculaNueva = new Matricula({
+            if(alumno.rol !== 'ALUMNO') {
+                return res.status(400).json({
+                    message: "Solo se pueden matricular usuarios con rol ALUMNO"
+                })
+            }
+
+            const result = new Matricula({
                 usuario: usuarioID,
                 curso: cursoID,
-            })
-
-            const result = await matriculaNueva.save()
+            }).save();
 
             return res.status(201).json({
                 message: "Matricula nueva registrada correctamente",
@@ -60,6 +50,11 @@ class matriculaController {
             })
 
         } catch (error) {
+            if(error.code === 11000) {
+                return res.status(409).json({
+                    message: "El alumno ya esta matriculado en este curso"
+                })
+            }
             console.log("Error al registrar matricula")
             return res.status(500).json({
                 message: "Error al registrar matricula"
@@ -111,13 +106,13 @@ class matriculaController {
 
     async listarMatriculas(req, res) {
         try{
-            const {cursoID, alumnoID, estado} = req.query;
+            const {cursoID, alumnoID, activa} = req.query;
 
             const filtro = {};
 
-            if(alumnoID) filtro.usuario = alumnoID
+            if(alumnoID) filtro.usuario = alumnoID;
             if(cursoID) filtro.curso = cursoID;
-            if(estado) filtro.estado = estado;
+            if(activa !== undefined) filtro.activa = activa;
 
             const result = await Matricula.find(filtro)
             .populate('curso', 'nombre nivel precio')

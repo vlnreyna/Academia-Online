@@ -7,13 +7,13 @@ const cursoValidator = require('../validators/curso.validator')
 
 ruta.use(verificarToken)
 
-ruta.get('/', cursoController.mostrarCursos)
-ruta.get('/:id', cursoController.mostrarCursos)
+ruta.get('/', cursoValidator.validarListarCursos, cursoController.mostrarCursos)
+ruta.get('/:id', cursoValidator.validarId, cursoController.obtenerCurso)
 
 ruta.post('/insertarCurso', permitirRol(['ADMIN']), cursoValidator.validarCrearCurso, cursoController.insertarCurso)
 
 ruta.put('/actualizarCurso/:id', permitirRol(['ADMIN']), cursoValidator.validarActualizarCurso, cursoController.actualizarCurso)
-ruta.put('/cambiarEstado/:id', permitirRol(['ADMIN']), cursoValidator.validarCambiarEstado, cursoController.cambiarEstado)
+ruta.put('/cambiarEstado/:id', permitirRol(['ADMIN']), cursoValidator.validarId, cursoController.cambiarEstado)
 
 
 module.exports = ruta;

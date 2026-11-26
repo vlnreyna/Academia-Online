@@ -1,7 +1,10 @@
 const { body, param } = require('express-validator');
 
 const idCategoria = param('id').isMongoId().withMessage('El id de la categoria no es valido')
+
 class categoriaValidator {
+    validarId = [idCategoria];
+
     validarCrear = [
         body('nombre')
             .trim()
@@ -11,10 +14,6 @@ class categoriaValidator {
             .optional()
             .trim()
             .isLength({ max: 200 }).withMessage('La descripcion no puede superar los 200 caracteres')
-    ];
-
-    validarCambiarEstado = [
-        idCategoria
     ];
 }
 
