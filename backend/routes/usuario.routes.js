@@ -19,3 +19,5 @@ ruta.put('/desactivarUsuario/:id', permitirRol(['ADMIN']), usuarioValidator.vali
 ruta.put('/activarUsuario/:id', permitirRol(['ADMIN']), usuarioValidator.validarCambiarEstado, usuarioController.activarUsuario);
 ruta.get('/listarAlumnos', permitirRol(['ADMIN']), usuarioController.listarAlumnos);
 ruta.get('/listarAgentes', permitirRol(['ADMIN']), usuarioController.listarAgentes);
+
+module.exports = ruta;

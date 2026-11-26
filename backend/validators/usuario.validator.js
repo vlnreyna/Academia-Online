@@ -3,7 +3,7 @@ const { body, param } = require('express-validator');
 const ROLES = ['ALUMNO', 'AGENTE', 'ADMIN'];
 
 const validarPasswordSegura = (campo, mensaje) => {
-    body(campo)
+    return body(campo)
         .notEmpty().withMessage(mensaje)
         .isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres')
         .matches(/[A-Z]/).withMessage('Debe contener al menos una mayúscula')
