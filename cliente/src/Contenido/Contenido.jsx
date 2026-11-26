@@ -7,10 +7,13 @@ const asignaturas = [
     {id: 4, nombre: 'Historia', descripcion: 'Etapas Historicas, Dimesiones de Análisis y Metodología', icono: '👴👵'}
 ]
 
-export default function Home(){
+export default function Home({ irA }){
     return(
         <main className='Contenido'>
             <h1 className='Contenido-Titulo'>Asignaturas</h1>
+            <button type='button' className='Contenido-Boton' onClick={() => irA('incidencias')}>
+                Incidencias
+            </button>
             <div className='Contenido-Grid'>
                 {asignaturas.map((asignatura) => (
           <div key={asignatura.id} className='asignatura'>

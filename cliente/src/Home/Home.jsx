@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import './Home.css'
-import Tickets from './Tickets'
+import Tickets from '../Tickets/Tickets'
 
-// Texto de ejemplo: sustituir por la historia y fundación reales del proyecto.
 const HISTORIA = [
   'Academia Aldea nació con una idea sencilla: que aprender sea accesible y cercano, desde cualquier lugar.',
   'Empezamos con un pequeño grupo de profesores y alumnos, y hoy ofrecemos cursos online con un equipo de soporte que responde a cada consulta.',
@@ -61,7 +60,7 @@ export default function Home({ irA }) {
           <button type="button" className="btn btn-primary" onClick={() => setVerTickets(true)}>
             Abrir un ticket
           </button>
-          <button type="button" className="btn btn-secundario" onClick={() => irA?.('signup')}>
+          <button type="button" className="btn btn-secundario" onClick={() => irA('signup')}>
             Crear cuenta
           </button>
         </div>

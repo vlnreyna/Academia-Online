@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { EMAIL_REGEX } from './Config'
-import { post } from './api'
+import { EMAIL_REGEX } from '../Config'
+import { post } from '../api'
 import './SingUp.css'
 
-export default function SignUp() {
+export default function SignUp({ irA }) {
     const navigate = useNavigate()
     const [form, setForm] = useState({ nombre: '', apellido: '', email: '', password: '', confirmar: '' })
     const [error, setError] = useState('')
@@ -103,10 +103,10 @@ export default function SignUp() {
                         onChange={handleChange}
                     />
                     <p className="auth-texto">
-                        ¿Ya tienes una cuenta? <Link to="/login">Inicia sesión.</Link>
+                        ¿Ya tienes una cuenta? <Link to="/login" onClick={() => irA('login')}>Inicia sesión.</Link>
                     </p>
                     <div className="auth-botones">
-                        <button type="button" className="auth-boton auth-boton-secundario" onClick={() => navigate('/login')}>
+                        <button type="button" className="auth-boton auth-boton-secundario" onClick={() => irA('login')}>
                             Atrás
                         </button>
                         <button type="submit" className="auth-boton auth-boton-principal" disabled={cargando}>

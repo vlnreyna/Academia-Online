@@ -61,3 +61,23 @@
     transition: none;
   }
 }
+
+.Contenido-Boton {
+  display: block;
+  margin: 0 auto 28px;
+  padding: 12px 28px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #05070b;
+  background: linear-gradient(100deg, #a9adb4 0%, #eef0f2 40%, #b9bcc2 65%, #eef0f2 100%);
+  border: 1px solid #c7cad0;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.Contenido-Boton:hover {
+  filter: brightness(1.08);
+}

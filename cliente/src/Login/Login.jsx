@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { API_URL, EMAIL_REGEX } from './Config'
+import { EMAIL_REGEX } from '../Config'
+import { post } from '../api'
 import './Login.css'
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, irA }) {
     const location = useLocation()
     const navigate = useNavigate()
     const [paso, setPaso] = useState(1)
@@ -38,21 +39,15 @@ export default function Login({ onLogin }) {
         setError('')
         setCargando(true)
         try {
-            const respuesta = await fetch(`${API_URL}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email.trim(), password })
+            const datos = await post('/usuarios/login', {
+                email: email.trim(),
+                password
             })
-            const datos = await respuesta.json()
-            if (!respuesta.ok) {
-                setError(datos.message || 'Correo o contraseña incorrectos')
-                return
-            }
             localStorage.setItem('token', datos.token)
             onLogin(datos.usuario)
             navigate('/')
-        } catch {
-            setError('No se pudo conectar con el servidor')
+        } catch (error) {
+            setError(error.message)
         } finally {
             setCargando(false)
         }
@@ -81,7 +76,7 @@ export default function Login({ onLogin }) {
                             autoFocus
                         />
                         <p className="auth-texto">
-                            ¿No tienes una cuenta? <Link to="/registro">Crea una.</Link>
+                            ¿No tienes una cuenta? <Link to="/registro" onClick={() => irA('signup')}>Crea una Cuenta.</Link>
                         </p>
                         <div className="auth-botones">
                             <button type="submit" className="auth-boton auth-boton-principal">
@@ -117,4 +112,3 @@ export default function Login({ onLogin }) {
         </div>
     )
 }
-
