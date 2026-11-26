@@ -3,12 +3,16 @@ const {validationResult} = require('express-validator');
 
 const comprobarErrores = (req, res) => {
     const errores = validationResult(req);
+
     if(!errores.isEmpty()) {
-        return res.status(400).json({
-            message: "Error de validacion", 
+        res.status(400).json({
+            message: "Error de validacion",
             errores: errores.array()
         });
+        return true;
     }
+
+    return false;
 }
 
 const cargarCurso = async (req, res) => {
@@ -17,18 +21,21 @@ const cargarCurso = async (req, res) => {
         res.status(404).json({message: "Curso no encontrado"});
         return null;
     }
-    if(!tieneAcceso(curso, req.usuario)) {
-        res.status(401).json({message: "No tiene acceso a este curso"});
-        return null;
-    }
     return curso
 }
 
 class cursoController {
     async mostrarCursos(req, res) {
-        const result = await Curso.find()
+
+        const filtro = {}
+        const cursoID = req.params.id;
+
+        if(cursoID) filtro.cursoID = cursoID
+
+        const result = await Curso.find(filtro)
+
         return res.status(200).json({
-            message: "Todos los cursos",
+            message: "Cursos",
             result
         })
     }
@@ -57,8 +64,8 @@ class cursoController {
         try {
             if(comprobarErrores(req, res)) return;
 
-            const curso = await Curso.findById(req.params.id);
-            if(!curso) return res.status(404).json({message: "Curso no encontrado"});
+            const curso = await cargarCurso(req, res);
+            if(!curso) return
             
             curso.activo = !curso.activo;
             await curso.save();
@@ -76,47 +83,15 @@ class cursoController {
         }
     }
 
-    async obtenerCurso(req, res) {
-        try {
-            const {cursoID} = req.body;
-            if(!cursoID) return res.status(400).json({message: "No ha introduce el ID del curso"});
-            
-            const curso = await Curso.findById(cursoID);
-            if(!curso) return res.status(400).json({message: "No existe el curso"});
-
-            return res.status(200).json({
-                message: "Detalles del curso",
-                curso
-            })
-        } catch(error) {
-            console.log("Error al obtener detalles del curso");
-            return res.status(500).json({
-                message: "Error al obtener detalles del curso",
-                error: error.message
-            })
-        }
-    }
-
     async actualizarCurso (req, res) {
         try {
-            const errores = validationResult(req);
-            if(!errores.isEmpty()) return res.status(400).json({
-                message: "Error de validacion",
-                error: errores.array()
-            });
+            if(comprobarErrores(req, res)) return;
 
-            const {cursoID, nombre, descripcion, nivel, duracionHoras, precio} = req.body;
-            const curso = await Curso.findById(cursoID);
-
-            if(!curso) return res.status(404).json({message: "El curso no existe"});
+            const curso = await cargarCurso(req, res);
+            if(!curso) return;
 
             const result = await curso.updateOne({
-                id: cursoID,
-                nombre: nombre,
-                descripcion: descripcion,
-                nivel: nivel,
-                duracionHoras: duracionHoras,
-                precio: precio
+                $set: req.body
             });
 
             return res.status(200).json({
