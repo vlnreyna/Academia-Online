@@ -1,20 +1,18 @@
-const { body, params, query } = require('express-validator');
+const { body, param, query } = require('express-validator');
+
+const idMatricula = param('id').isMongoId().withMessage('El ID de la matrícula no es válido')
 
 class matriculaValidator {
+    validarCambiarEstado = [idMatricula];
+
     validarCrearMatricula = [
         body('cursoID')
-        .notEmpty().withMessage('El ID del curso es obligatorio')
-        .isMongoId().withMessage('El ID del curso no es válido'),
+            .notEmpty().withMessage('El ID del curso es obligatorio')
+            .isMongoId().withMessage('El ID del curso no es válido'),
 
-    body('usuarioID')
-        .notEmpty().withMessage('El ID del usuario es obligatorio')
-        .isMongoId().withMessage('El ID del usuario no es válido')
-    ];
-
-    validarCambiarEstado = [
-        param('id')
-            .notEmpty().withMessage('El ID de la matrícula es obligatorio')
-            .isMongoId().withMessage('El ID de la matrícula no es válido')
+        body('usuarioID')
+            .optional()
+            .isMongoId().withMessage('El ID del usuario no es válido')
     ];
 
     validarListarMatriculas = [
@@ -31,7 +29,6 @@ class matriculaValidator {
             .isBoolean().withMessage('El campo activa debe ser true o false')
             .toBoolean()
     ];
-
 }
 
 module.exports = new matriculaValidator();

@@ -10,7 +10,7 @@ ruta.use(verificarToken)
 ruta.get('/', permitirRol(['ADMIN']), matriculaValidator.validarListarMatriculas, matriculaController.listarMatriculas);
 ruta.get('/misMatriculas', matriculaController.misMatriculas);
 
-ruta.post('/crearMatricula', matriculaValidator.validarCrearMatricula, matriculaController.crearMatricula);
+ruta.post('/crearMatricula', permitirRol(['ALUMNO', 'ADMIN']), matriculaValidator.validarCrearMatricula, matriculaController.crearMatricula);
 
 ruta.put('/cambiarEstado/:id', permitirRol(['ADMIN']), matriculaValidator.validarCambiarEstado, matriculaController.cambiarEstado);
 
