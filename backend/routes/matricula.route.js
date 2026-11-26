@@ -5,12 +5,14 @@ const {verificarToken, permitirRol} = require ('../middleware/token.middleware')
 const matriculaController = require ('../controllers/matricula.controller');
 const matriculaValidator = require ('../validators/matricula.validator');
 
-ruta.post('/registrar', verificarToken, permitirRol(['ADMIN']), matriculaValidator.validarMatricula, matriculaController.registro);
-ruta.get('/misMatriculas', verificarToken, matriculaController.misMatriculas);
-ruta.get('/listarMatriculas', verificarToken, permitirRol(['ADMIN']), matriculaController.listarMatriculas);
+ruta.use(verificarToken)
 
-ruta.put('/activarMatricula', verificarToken, permitirRol(['ADMIN']), matriculaController.activarMatricula);
-ruta.put('/desactivarMatricula', verificarToken, permitirRol(['ADMIN']), matriculaController.desactivarMatricula);
+ruta.get('/', permitirRol(['ADMIN']), matriculaValidator.validarListarMatriculas, matriculaController.listarMatriculas);
+ruta.get('/misMatriculas', matriculaController.misMatriculas);
+
+ruta.post('/crearMatricula', matriculaValidator.validarCrearMatricula, matriculaController.crearMatricula);
+
+ruta.put('/cambiarEstado/:id', permitirRol(['ADMIN']), matriculaValidator.validarCambiarEstado, matriculaController.cambiarEstado);
 
 
 module.exports = ruta;

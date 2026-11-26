@@ -11,12 +11,11 @@ const matriculaSchema = new mongoose.Schema({
         ref: 'Curso',
         required: true,
     },
-    estado: {
-        type: String,
+    activa: {
+        type: Boolean,
         required: true,
         trim: true,
-        enum: ['ACTIVADA', 'CANCELADA'],
-        default: 'ACTIVADA'
+        default: true
     }
 }, 
 {

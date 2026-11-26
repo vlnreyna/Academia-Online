@@ -3,51 +3,62 @@ const Usuario = require('../models/usuario.model')
 const Curso = require('../models/curso.model')
 const {validationResult} = require('express-validator');
 
+const comprobarErrores = (req, res) => {
+    const errores = validationResult(req);
+
+    if(!errores.isEmpty()) {
+        res.status(400).json({
+            message: "Error de validacion",
+            errores: errores.array()
+        });
+        return true;
+    }
+
+    return false;
+}
+
+const cargarMatricula = async (req, res) => {
+    const matricula = await Matricula.findById(req.params.id);
+    if(!matricula) {
+        res.status(404).json({message: "Matricula no encontrada"});
+        return null;
+    }
+    return matricula
+}
 
 class matriculaController {
-    async registro(req, res) {
+    async crearMatricula(req, res) {
         try {
+            if(comprobarErrores(req, res)) return;
 
-            const errores = validationResult(req);
-            if(!errores.isEmpty()) {
-                return res.status(400).json({
-                    message: "Error de validacion",
-                    error: errores.array()
-                })
-            }
-            
-            const {cursoID, usuarioID, estado} = req.body;
-
-            const usuario = await Usuario.findById(usuarioID)
-            
-            if(!usuario) {
-                return res.status(404).json({
-                    message: "Usuario no encontrado"
-                })
-            }
+            const {cursoID, usuarioID} = req.body
 
             const curso = await Curso.findById(cursoID)
-
             if(!curso) {
                 return res.status(404).json({
                     message: "Coche no encontrado"
                 })
             }
 
+            const alumno = await Usuario.findById(usuarioID)
+            if(!alumno) {
+                return res.status(404).json({
+                    message: "Usuario no encontrado"
+                })
+            }
+
             const matriculaNueva = new Matricula({
-                usuario: {
-                    _id: usuario._id
-                },
-                curso: {
-                    _id: curso._id
-                }
+                usuario: usuarioID,
+                curso: cursoID,
             })
 
             const result = await matriculaNueva.save()
+
             return res.status(201).json({
                 message: "Matricula nueva registrada correctamente",
                 result
             })
+
         } catch (error) {
             console.log("Error al registrar matricula")
             return res.status(500).json({
@@ -56,49 +67,24 @@ class matriculaController {
         }
     }
 
-    async desactivarMatricula(req, res) {
+    async cambiarEstado(req, res) {
         try {
-            const {matriculaID} = req.body;
+            if(comprobarErrores(req, res)) return;
 
-            const matricula = await Matricula.findById(matriculaID);
-
-            if(!matricula) return res.status(400).json({message: "Matricula no encontrada"});
-
-            const result = await matricula.updateOne({
-                estado: 'CANCELADA'
-            })
+            const matricula = await cargarMatricula(req, res);
+            if(!matricula) return
+            
+            matricula.activa = !matricula.activa;
+            await matricula.save();
 
             return res.status(200).json({
-                message: "Matricula cancelada con exito"
+                message: "Estado de matricula cambiada",
+                matricula
             })
-        } catch(error){
-            console.log("Error al cancelar la matricula")
+        } catch(error) {
+            console.log("Error al cambiar estado del curso");
             return res.status(500).json({
-                message: "Error al cancelar la matricula",
-                error: error.message
-            })
-        }
-    }
-    
-    async activarMatricula(req, res) {
-        try {
-            const {matriculaID} = req.body;
-
-            const matricula = await Matricula.findById(matriculaID);
-
-            if(!matricula) return res.status(404).json({message: "Matricula no encontrada"});
-
-            const result = await matricula.updateOne({
-                estado: 'ACTIVADA'
-            })
-
-            return res.status(200).json({
-                message: "Matricula activada con exito"
-            })
-        } catch(error){
-            console.log("Error al activar la matricula")
-            return res.status(500).json({
-                message: "Error al activar la matricula",
+                message: "Error al cambiar estado del curso",
                 error: error.message
             })
         }
@@ -111,7 +97,7 @@ class matriculaController {
             .populate('curso', 'nombre descripcion nivel duracionHoras precio activo');
 
             return res.status(200).json({
-                message: "Matriculas matriculadas",
+                message: "Mis matriculas",
                 result
             })
         } catch(error) {
@@ -129,14 +115,9 @@ class matriculaController {
 
             const filtro = {};
 
-            if(req.usuario.rol === 'ALUMNO') {
-                filtro.usuario = req.usuario.id;
-            } else if (alumnoID) {
-                filtro.usuario = alumnoID;
-            }
-
+            if(alumnoID) filtro.usuario = alumnoID
             if(cursoID) filtro.curso = cursoID;
-            if(estado) filtro.estado = estado.toUpperCase();
+            if(estado) filtro.estado = estado;
 
             const result = await Matricula.find(filtro)
             .populate('curso', 'nombre nivel precio')
