@@ -4,17 +4,34 @@ const jwt = require('jsonwebtoken')
 const {validationResult} = require('express-validator')
 require('dotenv').config();
 
+const datosPublicos = (usuario) => ({
+    id: usuario.id,
+    nombre: usuario.nombre,
+    apellidos: usuario.apellidos,
+    email: usuario.email,
+    rol: usuario.rol,
+    activo: usuario.activo
+});
+
+
+const comprobarErrores = (req, res) => {
+    const errores = validationResult(req);
+
+    if(!errores.isEmpty()) {
+        res.status(400).json({
+            message: "Error de validacion",
+            errores: errores.array()
+        });
+        return true;
+    }
+
+    return false;
+}
+
 class usuarioController {
     async register(req, res) {
         try {
-            const errores = validationResult(req);
-
-            if(!errores.isEmpty()) {
-                return res.status(400).json({
-                    message: "Error de validacion", 
-                    errores: errores.array()
-                });
-            }
+            if(comprobarErrores(req, res)) return;
 
             const {nombre, apellidos, email, password} = req.body;
             const usuarioExiste = await Usuario.findOne({email});
@@ -38,13 +55,7 @@ class usuarioController {
 
             return res.status(201).json({
                 message: "Usuario insertado correctamente",
-                usuario: {
-                    id: usuarioNuevo.id,
-                    nombre,
-                    apellidos,
-                    email,
-                    rol: usuarioNuevo.rol
-                }
+                usuario: datosPublicos(usuarioNuevo)
             })
         } catch (error) {
             console.log("Error al insertar usuario")
@@ -57,14 +68,7 @@ class usuarioController {
 
     async login (req, res) {
         try {
-            const errores = validationResult(req);
-
-            if(!errores.isEmpty()) {
-                return res.status(400).json({
-                    message: "Error de validacion", 
-                    errores: errores.array()
-                });
-            }
+            if(comprobarErrores(req, res)) return;
 
             const { email, password } = req.body;
             const usuario = await Usuario.findOne({email}).select("+password");
@@ -93,12 +97,7 @@ class usuarioController {
             return res.status(200).json({
                 message: "Login exitoso",
                 token,
-                usuario: {
-                    id: usuario.id,
-                    nombre: usuario.nombre,
-                    apellidos: usuario.apellidos,
-                    rol: usuario.rol
-                }
+                usuario: datosPublicos(usuarioNuevo)
             })
 
         } catch(error) {
@@ -111,12 +110,7 @@ class usuarioController {
 
     async cambiarRol(req, res) {
         try {
-            const errores = validationResult(req)
-
-            if(!errores.isEmpty()) return res.status(400).json({
-                message: "Error de validacion",
-                error: errores.array()
-            })
+            if(comprobarErrores(req, res)) return;
 
             const {usuarioID, rol} = req.body;
 
@@ -127,13 +121,11 @@ class usuarioController {
             
             if(!usuario) return res.status(404).json({message: "No se ha encontrado al usuario"})
             
-            const result = await usuario.updateOne({
-                rol: rol
-            })
+            await usuario.updateOne({rol: rol})
 
             return res.status(200).json({
                 message: "Rol cambiado correctamente",
-                result
+                usuario: datosPublicos(usuarioNuevo)
             })
         } catch (error) {
             console.log("Error al cambiar de rol");
@@ -146,6 +138,8 @@ class usuarioController {
 
     async desactivarUsuario(req, res) {
         try {
+            if(comprobarErrores(req, res)) return;
+
             const {usuarioID} = req.body;
 
             if(!usuarioID) return res.status(400).json({message: "No ha escrito el ID del usuario"});
@@ -160,7 +154,7 @@ class usuarioController {
 
             return res.status(200).json({
                 message: "Usuario desactivado correctamente",
-                result
+                usuario: datosPublicos(usuarioNuevo)
             })
         } catch (error) {
             console.log("Error al desactivar usuario");
@@ -170,6 +164,8 @@ class usuarioController {
 
     async activarUsuario(req, res) {
         try {
+            if(comprobarErrores(req, res)) return;
+
             const {usuarioID} = req.body;
 
             if(!usuarioID) return res.status(400).json({message: "No ha escrito el ID del usuario"});
@@ -183,7 +179,7 @@ class usuarioController {
 
             return res.status(200).json({
                 message: "Usuario activado correctamente",
-                result
+                usuario: datosPublicos(usuarioNuevo)
             })
         } catch (error) {
             console.log("Error al activar usuario");
@@ -194,18 +190,14 @@ class usuarioController {
 
     async obtenerPerfil(req, res) {
         try {
+            if(comprobarErrores(req, res)) return;
+
             const usuarioID = req.usuario.id;
             const usuario = await Usuario.findById(usuarioID);
 
             return res.status(200).json({
                 message: "Datos de usuario obtenidos",
-                usuario: {
-                    id: usuario.id,
-                    nombre: usuario.nombre,
-                    apellidos: usuario.apellidos,
-                    email: usuario.email,
-                    rol: usuario.rol
-                }
+                usuario: datosPublicos(usuarioNuevo)
             })
         } catch(error) {
             console.log("Error al extraer datos del usuario")
@@ -218,11 +210,7 @@ class usuarioController {
 
     async editarPerfil(req, res) {
         try {
-            const errores = validationResult(req);
-            if(!errores.isEmpty) return res.status(400).json({
-                message: "Error de validacion",
-                error: errores.array()
-            })
+            if(comprobarErrores(req, res)) return;
 
             const usuarioID = req.usuario.id;
             const usuario = await Usuario.findById(usuarioID);
@@ -235,7 +223,7 @@ class usuarioController {
 
             return res.status(200).json({
                 message: "Datos de usuario cambiados correctamente",
-                result
+                usuario: datosPublicos(usuarioNuevo)
             })
         } catch(error) {
             console.log("Error al cambiar los datos de usuario");
@@ -248,12 +236,7 @@ class usuarioController {
 
     async cambiarPassword(req, res) {
         try {
-
-            const errores = validationResult(req);
-            if(!errores.isEmpty) return res.status(404).json({
-                message: "Error de validacion",
-                error: errores.array()
-            })
+            if(comprobarErrores(req, res)) return;
 
             const usuarioID = req.usuario.id;
             const usuario = await Usuario.findById(usuarioID).select("+password");
@@ -273,7 +256,6 @@ class usuarioController {
 
             return res.status(200).json({
                 message: "Contraseña cambiada correctamente",
-                result
             })
         } catch(error){
             console.log("Error al cambiar la contraseña");
@@ -286,6 +268,8 @@ class usuarioController {
 
     async listarAlumnos(req,res) {
         try {
+            if(comprobarErrores(req, res)) return;
+
             const alumnos = await Usuario.find({rol: "ALUMNO"});
             return res.status(200).json({
                 message: "Todos los alumnos",
@@ -302,6 +286,8 @@ class usuarioController {
 
     async listarAgentes(req,res) {
         try {
+            if(comprobarErrores(req, res)) return;
+
             const agentes = await Usuario.find({rol: "AGENTE"});
             return res.status(200).json({
                 message: "Todos los agentes",
