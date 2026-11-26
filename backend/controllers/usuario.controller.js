@@ -28,14 +28,23 @@ const comprobarErrores = (req, res) => {
     return false;
 }
 
+const cargarUsuario = async (req, res) => {
+    const usuario = await Usuario.findById(req.usuario.id);
+    if(!usuario) {
+        res.status(404).json({message: "Usuario no encontrado"});
+        return null;
+    }
+    return usuario
+}
+
 class usuarioController {
     async register(req, res) {
         try {
             if(comprobarErrores(req, res)) return;
 
             const {nombre, apellidos, email, password} = req.body;
-            const usuarioExiste = await Usuario.findOne({email});
 
+            const usuarioExiste = await Usuario.findOne({email});
             if(usuarioExiste) {
                 return res.status(409).json({
                     message: "El email posee una cuenta"
@@ -97,7 +106,7 @@ class usuarioController {
             return res.status(200).json({
                 message: "Login exitoso",
                 token,
-                usuario: datosPublicos(usuarioNuevo)
+                usuario: datosPublicos(usuario)
             })
 
         } catch(error) {
@@ -118,14 +127,14 @@ class usuarioController {
             if(usuarioID == req.usuario.id) return res.status(400).json({message: "No puedes cambiar tu propio rol"})
 
             const usuario = await Usuario.findById(usuarioID)
-            
             if(!usuario) return res.status(404).json({message: "No se ha encontrado al usuario"})
             
-            await usuario.updateOne({rol: rol})
+            usuario.rol = rol;
+            await usuario.save();
 
             return res.status(200).json({
                 message: "Rol cambiado correctamente",
-                usuario: datosPublicos(usuarioNuevo)
+                usuario: datosPublicos(usuario)
             })
         } catch (error) {
             console.log("Error al cambiar de rol");
@@ -136,54 +145,28 @@ class usuarioController {
         }
     }
 
-    async desactivarUsuario(req, res) {
+    async cambiarEstado(req, res) {
         try {
             if(comprobarErrores(req, res)) return;
 
-            const {usuarioID} = req.body;
+            const usuarioID = req.params.id;
 
-            if(!usuarioID) return res.status(400).json({message: "No ha escrito el ID del usuario"});
+            const usuario = await Usuario.findById(usuarioID);
+            if(!usuario) return res.status(404).json({message: "Usuario no encontrado"});
             
-            const usuario = await Usuario.findById(usuarioID)
-            
-            if(!usuario) return res.status(404).json({message: "No existe el usuario"});
-            
-            const result = await usuario.updateOne({
-                activo: false
-            })
+            usuario.activo = !usuario.activo;
+            await usuario.save();
 
             return res.status(200).json({
-                message: "Usuario desactivado correctamente",
-                usuario: datosPublicos(usuarioNuevo)
+                message: "Estado del usuario cambiado correctamente",
+                usuario: datosPublicos(usuario)
             })
-        } catch (error) {
-            console.log("Error al desactivar usuario");
-            return res.status(500).json({message: "Error al desactivar usuario"})
-        }
-    }
-
-    async activarUsuario(req, res) {
-        try {
-            if(comprobarErrores(req, res)) return;
-
-            const {usuarioID} = req.body;
-
-            if(!usuarioID) return res.status(400).json({message: "No ha escrito el ID del usuario"});
-            
-            const usuario = await Usuario.findById(usuarioID)
-
-            if(!usuario) return res.status(404).json({message: "No existe el usuario"});
-            const result = await usuario.updateOne({
-                activo: true
+        } catch(error) {
+            console.log("Error al cambiar estado del usuario");
+            return res.status(500).json({
+                message: "Error al cambiar estado del usuario",
+                error: error.message
             })
-
-            return res.status(200).json({
-                message: "Usuario activado correctamente",
-                usuario: datosPublicos(usuarioNuevo)
-            })
-        } catch (error) {
-            console.log("Error al activar usuario");
-            return res.status(500).json({message: "Error al activar usuario"})
         }
     }
     
@@ -191,13 +174,12 @@ class usuarioController {
     async obtenerPerfil(req, res) {
         try {
             if(comprobarErrores(req, res)) return;
-
-            const usuarioID = req.usuario.id;
-            const usuario = await Usuario.findById(usuarioID);
+            
+            const usuario = await cargarUsuario(req, res);
 
             return res.status(200).json({
                 message: "Datos de usuario obtenidos",
-                usuario: datosPublicos(usuarioNuevo)
+                usuario: datosPublicos(usuario)
             })
         } catch(error) {
             console.log("Error al extraer datos del usuario")
@@ -208,47 +190,51 @@ class usuarioController {
         }
     }
 
+    
+
     async editarPerfil(req, res) {
-        try {
-            if(comprobarErrores(req, res)) return;
+    try {
+        if(comprobarErrores(req, res)) return;
 
-            const usuarioID = req.usuario.id;
-            const usuario = await Usuario.findById(usuarioID);
+        const usuario = await cargarUsuario(req, res);
 
-            const {nombre, apellidos} = req.body;
-            const result = await usuario.updateOne({
-                nombre: nombre,
-                apellidos: apellidos
-            })
+        const { nombre, apellidos, email } = req.body;
 
-            return res.status(200).json({
-                message: "Datos de usuario cambiados correctamente",
-                usuario: datosPublicos(usuarioNuevo)
-            })
-        } catch(error) {
-            console.log("Error al cambiar los datos de usuario");
-            return res.status(500).json({
-                message: "Error al cambiar los datos de usuario",
-                error: error.message
-            })
-        }
+        const datosActualizar = {};
+
+        if(nombre !== undefined) datosActualizar.nombre = nombre;
+        if(apellidos !== undefined) datosActualizar.apellidos = apellidos;
+        if(email !== undefined) datosActualizar.email = email;
+
+        const result = await usuario.updateOne(
+            { $set: datosActualizar }
+        );
+
+        return res.status(200).json({
+            message: "Datos de usuario cambiados correctamente",
+            usuario: datosPublicos(result)
+        });
+
+    } catch(error) {
+        console.log("Error al cambiar los datos de usuario");
+        return res.status(500).json({
+            message: "Error al cambiar los datos de usuario",
+            error: error.message
+        });
     }
+}
 
     async cambiarPassword(req, res) {
         try {
             if(comprobarErrores(req, res)) return;
 
-            const usuarioID = req.usuario.id;
-            const usuario = await Usuario.findById(usuarioID).select("+password");
+            const usuario = await Usuario.findById(req.usuario.id).select("+password");
 
             const {passwordActual, passwordNueva} = req.body;
-
-            if(!passwordActual) return res.status(400).json({message: "No ha insertado la contraseña actual"});
             
             const correcto = await bcrypt.compare(passwordActual, usuario.password);
             
             if(!correcto) return res.status(400).json({message: "La contraseña no es correcta"});
-            if(!passwordNueva) return res.status(400).json({message: "No ha insertado la contraseña nueva"});
             if(passwordActual == passwordNueva) return res.status(400).json({message: "La contraseña nueva no puede ser igual que la anterior"});
 
             usuario.password = await bcrypt.hash(passwordNueva, 10);
@@ -256,6 +242,7 @@ class usuarioController {
 
             return res.status(200).json({
                 message: "Contraseña cambiada correctamente",
+                usuario: datosPublicos(result)
             })
         } catch(error){
             console.log("Error al cambiar la contraseña");
