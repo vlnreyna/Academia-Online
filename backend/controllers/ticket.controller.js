@@ -51,7 +51,7 @@ const cargarTicket = async (req, res) => {
         return null;
     }
     if(!tieneAcceso(ticket, req.usuario)) {
-        res.status(401).json({message: "No tiene acceso a este ticket"});
+        res.status(403).json({message: "No tiene acceso a este ticket"});
         return null;
     }
     return ticket
