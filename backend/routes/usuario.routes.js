@@ -12,11 +12,11 @@ ruta.put('/editarPerfil', verificarToken, usuarioValidator.validarEditarPerfil, 
 ruta.put('/cambiarRol',verificarToken, permitirRol(['ADMIN']), usuarioValidator.validarCambiarRol, usuarioController.cambiarRol)
 ruta.put('/desactivarUsuario', verificarToken, permitirRol(['ADMIN']), usuarioController.desactivarUsuario)
 ruta.put('/activarUsuario', verificarToken, permitirRol(['ADMIN']), usuarioController.activarUsuario)
-ruta.put('/cambiarContrasenia', verificarToken, usuarioController.cambiarPassword);
+ruta.put('/cambiarContrasenia', verificarToken, usuarioValidator.validarCambiarPassword, usuarioController.cambiarPassword);
 
 ruta.get('/perfil', verificarToken, usuarioController.obtenerPerfil);
 ruta.get('/listarAlumnos', verificarToken, permitirRol(['ADMIN']), usuarioController.listarAlumnos);
-ruta.get('/listarAgentes', verificarToken, permitirRol(['ADMIN']), usuarioValidator.validarCambiarPassword, usuarioController.listarAgentes);
+ruta.get('/listarAgentes', verificarToken, permitirRol(['ADMIN']), usuarioController.listarAgentes);
 
 
 module.exports = ruta;

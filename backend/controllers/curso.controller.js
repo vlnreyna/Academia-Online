@@ -1,6 +1,29 @@
 const Curso = require('../models/curso.model');
 const {validationResult} = require('express-validator');
 
+const comprobarErrores = (req, res) => {
+    const errores = validationResult(req);
+    if(!errores.isEmpty()) {
+        return res.status(400).json({
+            message: "Error de validacion", 
+            errores: errores.array()
+        });
+    }
+}
+
+const cargarCurso = async (req, res) => {
+    const curso = await Curso.findById(req.params.id);
+    if(!curso) {
+        res.status(404).json({message: "Curso no encontrado"});
+        return null;
+    }
+    if(!tieneAcceso(curso, req.usuario)) {
+        res.status(401).json({message: "No tiene acceso a este curso"});
+        return null;
+    }
+    return curso
+}
+
 class cursoController {
     async mostrarCursos(req, res) {
         const result = await Curso.find()
@@ -12,14 +35,7 @@ class cursoController {
 
     async insertarCurso(req, res) {
         try {
-            const errores = validationResult(req);
-
-            if(!errores.isEmpty()) {
-                return res.status(400).json({
-                    message: "Error de validacion", 
-                    errores: errores.array()
-                });
-            }
+            if(comprobarErrores(req, res)) return;
 
             const curso = req.body;
             const cursoNuevo = new Curso(curso)
@@ -37,67 +53,24 @@ class cursoController {
         }
     }
 
-    async eliminarCurso(req, res) {
+    async cambiarEstado(req, res) {
         try {
-            const {cursoID} = req.body;
-            const curso = await Curso.findById(cursoID);
+            if(comprobarErrores(req, res)) return;
 
-            if(!curso) return res.status(404).json({message: "Curso no encontrado"})
+            const curso = await Curso.findById(req.params.id);
+            if(!curso) return res.status(404).json({message: "Curso no encontrado"});
             
-            const result = await Curso.deleteOne(curso);
-            return res.status(200).json({message: "Curso eliminado correctamente", result})
+            curso.activo = !curso.activo;
+            await curso.save();
+
+            return res.status(200).json({
+                message: "Estado del curso cambiado correctamente",
+                curso
+            })
         } catch(error) {
-            console.log("Error al eliminar el curso");
+            console.log("Error al cambiar estado del curso");
             return res.status(500).json({
-                message: "Error al eliminar el curso",
-                error: error.message
-            });
-        }
-    }
-
-    async desactivarCurso(req, res) {   
-        try {
-            const {cursoID} = req.body;
-            const curso = await Curso.findById(cursoID);
-
-            if(!curso) return res.status(404).json({message: "Curso no encontrado"})
-
-            const result = await curso.updateOne({
-                activo: false
-            })
-
-            return res.status(200).json({
-                message: "Curso desactivado correctamente",
-                result
-            })
-        } catch (error) {
-            console.log("Error al desactivar curso")
-            return res.status(500).json({
-                message: "Error al desactivar curso",
-                error: error.message
-            })
-        }
-    }
-
-    async activarCurso (req, res) {
-        try {
-            const {cursoID} = req.body;
-            const curso = await Curso.findById(cursoID);
-
-            if(!curso) return res.status(404).json({message: "Curso no encontrado"})
-
-            const result = await curso.updateOne({
-                activo: true
-            })
-
-            return res.status(200).json({
-                message: "Curso activado correctamente",
-                result
-            })
-        } catch (error) {
-            console.log("Error al activar curso")
-            return res.status(500).json({
-                message: "Error al activar curso",
+                message: "Error al cambiar estado del curso",
                 error: error.message
             })
         }

@@ -129,7 +129,7 @@ class matriculaController {
 
             const filtro = {};
 
-            if(req.usuario.id === 'ALUMNO') {
+            if(req.usuario.rol === 'ALUMNO') {
                 filtro.usuario = req.usuario.id;
             } else if (alumnoID) {
                 filtro.usuario = alumnoID;
