@@ -29,7 +29,7 @@ const comprobarErrores = (req, res) => {
     if(!errores.isEmpty()) {
         res.status(400).json({
             message: "Error de validacion",
-            error: error.array()
+            error: errores.array()
         });
         return true;
     }
@@ -96,17 +96,17 @@ class ticketController {
             const {estado, prioridad, categoria, cliente, agente} = req.query;
             
             const filtros = {};
-            if(estado) filtro.estado = estado;
-            if(prioridad) filtro.prioridad = prioridad;
-            if(categoria) filtro.categoria = categoria;
+            if(estado) filtros.estado = estado;
+            if(prioridad) filtros.prioridad = prioridad;
+            if(categoria) filtros.categoria = categoria;
 
             if(req.usuario.rol === 'ALUMNO') {
-                filtro.cliente = req.usuario.id;
+                filtros.cliente = req.usuario.id;
             } else if (req.usuario.rol === 'AGENTE') {
-                filtro.agente = req.usuario.id;
+                filtros.agente = req.usuario.id;
             } else {
-                if(cliente) filtro.cliente = cliente;
-                if(agente) filtro.agente = agente;
+                if(cliente) filtros.cliente = cliente;
+                if(agente) filtros.agente = agente;
             }
 
             const result = await Ticket.find(filtros)
@@ -129,13 +129,13 @@ class ticketController {
         try {
             if(comprobarErrores(req, res)) return;
 
-            const ticket = cargarTicket(req, res);
+            const ticket = await cargarTicket(req, res);
             if(!ticket) return;
 
             await ticket.populate(POPULATE);
             await ticket.populate({ path: 'historialEstados.por', select: 'nombre apellidos rol' });
             
-            const respuestas = Respuesta.find({ticket: ticket._id})
+            const respuestas = await Respuesta.find({ticket: ticket._id})
             .populate('autor', 'nombre apellidos rol');
 
             return res.status(200).json({
@@ -197,7 +197,7 @@ class ticketController {
         try {
             if(comprobarErrores(req, res)) return;
 
-            const ticket = cargarTicket(req, res);
+            const ticket = await cargarTicket(req, res);
             if(!ticket) return
 
             const {estado} = req.body;
@@ -240,7 +240,7 @@ class ticketController {
         try {
             if(comprobarErrores(req, res)) return;
 
-            const ticket = cargarTicket(req, res);
+            const ticket = await cargarTicket(req, res);
             if(!ticket) return;
 
             ticket.prioridad = req.body.prioridad;
@@ -260,7 +260,7 @@ class ticketController {
 
     async asignarAgente(req, res) {
         try {
-            if (hayErrores(req, res)) return;
+            if (comprobarErrores(req, res)) return;
 
             const { ticketID, agenteID } = req.body;
 
