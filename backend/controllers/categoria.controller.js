@@ -3,12 +3,16 @@ const Categoria = require('../models/categoria.model');
 
 const comprobarErrores = (req, res) => {
     const errores = validationResult(req);
+
     if(!errores.isEmpty()) {
-        return res.status(400).json({
+        res.status(400).json({
             message: "Error de validacion",
             error: errores.array()
-        })
+        });
+        return true;
     }
+
+    return false;
 }
 
 class categoriaController {
@@ -16,9 +20,12 @@ class categoriaController {
         try {
             let filtro = {};
 
-            if(req.usuario.rol == 'ADMIN') {
-                filtro = {activa: true}
+            if(req.usuario.rol !== 'ADMIN') {
+                filtro.activa = true
             }
+            
+            const categoriaID = req.params.id
+            if (categoriaID) filtro.categoriaID = categoriaID;
 
             const result = await Categoria.find(filtro);
 
