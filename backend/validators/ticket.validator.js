@@ -58,13 +58,11 @@ class ticketValidator {
     ];
 
     validarListado = [
-        query('estado').optional().toUpperCase().isIn(ESTADOS).withMessage('Estado no valido'),
-        query('prioridad').optional().toUpperCase().isIn(PRIORIDADES).withMessage('Prioridad no valida'),
+        query('estado').optional().trim().toUpperCase().isIn(ESTADOS).withMessage('Estado no valido'),
+        query('prioridad').optional().trim().toUpperCase().isIn(PRIORIDADES).withMessage('Prioridad no valida'),
         query('categoria').optional().isMongoId().withMessage('Categoria no valida'),
         query('cliente').optional().isMongoId().withMessage('Cliente no valido'),
         query('agente').optional().isMongoId().withMessage('Agente no valido'),
-        query('page').optional().isInt({ min: 1 }).withMessage('page debe ser un entero >= 1'),
-        query('limit').optional().isInt({ min: 1, max: 50 }).withMessage('limit debe estar entre 1 y 50')
     ];
 }
 

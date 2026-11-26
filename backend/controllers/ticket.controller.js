@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator');
+const { comprobarErrores } = require('../middleware/validacion.middleware');
 const Ticket = require('../models/ticket.model');
 const Usuario = require('../models/usuario.model');
 const Categoria = require('../models/categoria.model');
@@ -13,6 +13,12 @@ const TRANSICIONES = {
     },
     ALUMNO: {
         RESUELTO: ['CERRADO', 'EN_CURSO']
+    },
+    ADMIN: {
+        ABIERTO: ['EN_CURSO', 'CERRADO'],
+        EN_CURSO: ['PENDIENTE_CLIENTE', 'RESUELTO', 'CERRADO'],
+        PENDIENTE_CLIENTE: ['EN_CURSO', 'CERRADO'],
+        RESUELTO: ['EN_CURSO', 'CERRADO']
     }
 };
 
@@ -21,21 +27,6 @@ const POPULATE = [
     { path: 'agente', select: 'nombre apellidos email' },
     { path: 'categoria', select: 'nombre' }
 ];
-
-
-const comprobarErrores = (req, res) => {
-    const errores = validationResult(req);
-
-    if(!errores.isEmpty()) {
-        res.status(400).json({
-            message: "Error de validacion",
-            error: errores.array()
-        });
-        return true;
-    }
-
-    return false;
-}
 
 const tieneAcceso = (ticket, usuario) => {
     if(usuario.rol === 'ADMIN') return true;
@@ -70,6 +61,11 @@ class ticketController {
 
             const { asunto, descripcion, categoria, prioridad} = req.body;
             
+            const categoriaExiste = await Categoria.findById(categoria);
+            if(!categoriaExiste || !categoriaExiste.activa) {
+                return res.status(400).json({message: "La categoria no existe o no esta activa"});
+            }
+
             const ticket = await new Ticket({
                 asunto, descripcion, categoria, prioridad,
                 cliente: req.usuario.id,
@@ -169,16 +165,13 @@ class ticketController {
                 contenido: req.body.contenido
             }).save();
 
-            let cambio = false;
             if(req.usuario.rol === 'AGENTE' && ticket.estado === 'ABIERTO'){
                 registrarEstado(ticket, 'EN_CURSO', req.usuario.id);
-                cambio = true
+                await ticket.save()
             } else if(req.usuario.rol === 'ALUMNO' && ticket.estado === 'PENDIENTE_CLIENTE') {
                 registrarEstado(ticket, 'EN_CURSO', req.usuario.id);
-                cambio = true;
+                await ticket.save()
             }
-
-            if(cambio) await ticket.save();
 
             return res.status(201).json({
                 message: "Respuesta enviada",
@@ -203,10 +196,11 @@ class ticketController {
             const {estado} = req.body;
 
             if(estado === ticket.estado) {
-                return res.status(400).json({message: "El ticke ya posee este estado"});
+                return res.status(400).json({message: "El ticket ya posee este estado"});
             }
 
             const transicionesRol = TRANSICIONES[req.usuario.rol];
+
             if(!transicionesRol || !transicionesRol[ticket.estado]) {
                 return res.status(403).json({
                     message: `No puedes cambiar el estado del ticket ${ticket.estado}`
@@ -243,6 +237,10 @@ class ticketController {
             const ticket = await cargarTicket(req, res);
             if(!ticket) return;
 
+            if(ticket.estado === 'CERRADO') {
+                return res.status(400).json({message: "No se puede cambiar la prioridad de un ticket cerrado"});
+            }
+
             ticket.prioridad = req.body.prioridad;
             await ticket.save();
 
@@ -266,7 +264,7 @@ class ticketController {
 
             const ticket = await Ticket.findById(ticketID)
             if(!ticket) return res.status(404).json({message: "El ticket no existe"});
-            
+
             if(ticket.estado === 'CERRADO') {
                 return res.status(400).json({message: "No se puede asignar a un ticket cerrado"});
             }
@@ -275,7 +273,7 @@ class ticketController {
             if(!agente || agente.rol !== 'AGENTE' || !agente.activo) {
                 return res.status(400).json({message: "El agente no existe o no esta activo"});
             }
-            
+
             ticket.agente = agente._id
             await ticket.save();
 
