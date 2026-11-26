@@ -1,8 +1,8 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './Home.css'
 import Tickets from './Tickets'
 
-// Texto de ejemplo: sustituir por la historia y fundación reales del proyecto.
 const HISTORIA = [
   'Academia Aldea nació con una idea sencilla: que aprender sea accesible y cercano, desde cualquier lugar.',
   'Empezamos con un pequeño grupo de profesores y alumnos, y hoy ofrecemos cursos online con un equipo de soporte que responde a cada consulta.',
@@ -33,8 +33,9 @@ const ACCESOS = [
   { titulo: 'Estado en tiempo real', texto: 'Mira en qué punto está tu consulta.' },
 ]
 
-export default function Home({ irA }) {
+export default function Home({ usuario }) {
   const [verTickets, setVerTickets] = useState(false)
+  const navigate = useNavigate()
 
   if (verTickets) {
     return (
@@ -61,9 +62,16 @@ export default function Home({ irA }) {
           <button type="button" className="btn btn-primary" onClick={() => setVerTickets(true)}>
             Abrir un ticket
           </button>
-          <button type="button" className="btn btn-secundario" onClick={() => irA?.('signup')}>
-            Crear cuenta
-          </button>
+          {!usuario && (
+            <>
+              <button type="button" className="btn btn-secundario" onClick={() => navigate('/login')}>
+                Iniciar sesión
+              </button>
+              <button type="button" className="btn btn-secundario" onClick={() => navigate('/registro')}>
+                Crear cuenta
+              </button>
+            </>
+          )}
         </div>
       </header>
 
