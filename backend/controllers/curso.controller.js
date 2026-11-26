@@ -16,10 +16,9 @@ class cursoController {
         try {
             if(comprobarErrores(req, res)) return;
             
-            const {cursoID, nombre, nivel, activo} = req.query;
+            const {nombre, nivel, activo} = req.query;
             const filtro = {}
     
-            if(cursoID) filtro.cursoID = cursoID;
             if(nombre) filtro.nombre = nombre;
             if(nivel) filtro.nivel = nivel;
 
@@ -39,6 +38,28 @@ class cursoController {
             console.log("Error al listar los cursos");
             return res.status(500).json({
                 message: "Error al listar los cursos",
+                error: error.message
+            })
+        }
+    }
+
+    async obtenerCurso(req, res) {
+        try {
+            if(comprobarErrores(req, res)) return;
+
+            const curso = await Curso.findById(req.params.id);
+            if(!curso || (!curso.activo && !esAdmin(req))) {
+                return res.status(404).json({message: "Curso no encontrado"});
+            }
+
+            return res.status(200).json({
+                message: "Curso",
+                result: curso
+            })
+        } catch(error) {
+            console.log("Error al obtener el curso");
+            return res.status(500).json({
+                message: "Error al obtener el curso",
                 error: error.message
             })
         }

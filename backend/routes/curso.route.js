@@ -8,6 +8,7 @@ const cursoValidator = require('../validators/curso.validator')
 ruta.use(verificarToken)
 
 ruta.get('/', cursoValidator.validarListarCursos, cursoController.mostrarCursos)
+ruta.get('/:id', cursoValidator.validarId, cursoController.obtenerCurso)
 
 ruta.post('/insertarCurso', permitirRol(['ADMIN']), cursoValidator.validarCrearCurso, cursoController.insertarCurso)
 
