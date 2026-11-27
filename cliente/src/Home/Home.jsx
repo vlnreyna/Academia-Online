@@ -51,6 +51,12 @@ export default function Home({ irA }) {
   return (
     <div className="home">
       <header className="home-hero">
+        <button type="button" className="home-cuenta" aria-label="Mi cuenta" onClick={() => irA('acceso')}>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
+          </svg>
+        </button>
         <img src="/logo-academia-aldea.png" alt="Academia Aldea" className="home-logo" />
         <h1>Aprende a tu ritmo, con soporte cercano</h1>
         <p className="home-subtitulo">
