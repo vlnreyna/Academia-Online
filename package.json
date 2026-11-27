@@ -1,0 +1,26 @@
+{
+  "name": "academia-online",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n API,WEB -c blue,magenta --kill-others-on-fail \"npm run dev --prefix backend\" \"npm run dev --prefix cliente\"",
+    "install:all": "npm install && npm install --prefix backend && npm install --prefix cliente"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.5"
+  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vlnreyna/Academia-Online.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/vlnreyna/Academia-Online/issues"
+  },
+  "homepage": "https://github.com/vlnreyna/Academia-Online#readme"
+}
