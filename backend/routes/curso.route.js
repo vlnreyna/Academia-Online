@@ -5,10 +5,10 @@ const {verificarToken, permitirRol} = require ('../middleware/token.middleware')
 const cursoController = require ('../controllers/curso.controller')
 const cursoValidator = require('../validators/curso.validator')
 
-ruta.use(verificarToken)
-
 ruta.get('/', cursoValidator.validarListarCursos, cursoController.mostrarCursos)
 ruta.get('/:id', cursoValidator.validarId, cursoController.obtenerCurso)
+
+ruta.use(verificarToken)
 
 ruta.post('/insertarCurso', permitirRol(['ADMIN']), cursoValidator.validarCrearCurso, cursoController.insertarCurso)
 
