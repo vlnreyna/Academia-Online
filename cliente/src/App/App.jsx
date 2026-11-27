@@ -2,8 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import Navbar from '../ConectoresDePaginas/Navbar'
 import Home from '../Home/Home'
-import Login from '../Login/Login'
-import SignUp from '../SingUp/SignUp'
+import Acceso from '../Acceso/Acceso'
 import Contenido from '../Contenido/Contenido'
 import Incidencias from '../Incidencias/Incidencias'
 
@@ -13,8 +12,7 @@ function App() {
   return (
     <div className='App'>
       {vista === 'home' && <Home irA={setVista} />}
-      {vista === 'login' && <Login onLogin={() => setVista('contenido')} irA={setVista} />}
-      {vista === 'signup' && <SignUp irA={setVista} />}
+      {vista === 'acceso' && <Acceso onLogin={() => setVista('contenido')} irA={setVista} />}
       {vista === 'contenido' && <Contenido irA={setVista} />}
       {vista === 'incidencias' && <Incidencias />}
     </div>

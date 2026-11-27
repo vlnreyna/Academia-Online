@@ -1,0 +1,267 @@
+.acceso {
+    --ac-fondo: #05070b;
+    --ac-panel: rgba(11, 15, 22, 0.72);
+    --ac-borde: rgba(199, 202, 208, 0.16);
+    --ac-borde-fuerte: rgba(199, 202, 208, 0.45);
+    --ac-texto: #eef0f2;
+    --ac-suave: #8a919c;
+    --ac-acento: #c7cad0;
+    --ac-relleno: linear-gradient(100deg, #a9adb4 0%, #eef0f2 40%, #b9bcc2 65%, #eef0f2 100%);
+    --ac-error: #ff8a8a;
+    --ac-ok: #9fd3ef;
+
+    min-height: 100vh;
+    text-align: left;
+    padding: 3rem 1.5rem 4rem;
+    color: var(--ac-texto);
+    font-family: 'Jost', system-ui, sans-serif;
+    background:
+        radial-gradient(ellipse 80% 40% at 50% 100%, rgba(43, 106, 142, 0.35), transparent 70%),
+        var(--ac-fondo);
+    box-sizing: border-box;
+}
+
+.acceso *,
+.acceso *::before,
+.acceso *::after {
+    box-sizing: border-box;
+}
+
+.acceso :focus-visible {
+    outline: 2px solid var(--ac-texto);
+    outline-offset: 3px;
+}
+
+.acceso-cabecera {
+    max-width: 1000px;
+    margin: 0 auto 3rem;
+}
+
+.acceso-migas {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ac-suave);
+}
+
+.acceso-migas button {
+    padding: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.acceso-migas button:hover {
+    color: var(--ac-texto);
+}
+
+.acceso-migas-actual {
+    color: var(--ac-texto);
+    font-weight: 500;
+}
+
+.acceso-antetitulo {
+    margin: 1.4rem 0 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ac-acento);
+}
+
+.acceso-titulo {
+    margin: 0;
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+.acceso-subtitulo {
+    max-width: 440px;
+    margin: 0.9rem 0 0;
+    color: var(--ac-suave);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.acceso-paneles {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.acceso-panel {
+    padding: 2.25rem 2rem;
+    background: var(--ac-panel);
+    border: 1px solid var(--ac-borde);
+}
+
+.acceso-panel-titulo {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.acceso-panel-texto {
+    margin: 0.7rem 0 1.6rem;
+    color: var(--ac-suave);
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+.acceso-panel form {
+    display: grid;
+    gap: 1.1rem;
+}
+
+.acceso-fila {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.acceso-campo {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.acceso-campo span {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ac-texto);
+}
+
+.acceso-campo input {
+    width: 100%;
+    padding: 0.85rem 0.9rem;
+    font: inherit;
+    font-size: 0.92rem;
+    color: var(--ac-texto);
+    background: rgba(5, 7, 11, 0.6);
+    border: 1px solid var(--ac-borde);
+    border-radius: 0;
+    transition: border-color 0.2s ease;
+}
+
+.acceso-campo input::placeholder {
+    color: var(--ac-suave);
+    opacity: 0.75;
+}
+
+.acceso-campo input:hover {
+    border-color: var(--ac-borde-fuerte);
+}
+
+.acceso-campo input:focus {
+    outline: none;
+    border-color: var(--ac-acento);
+}
+
+.acceso-check {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    font-size: 0.85rem;
+    color: var(--ac-suave);
+    cursor: pointer;
+}
+
+.acceso-check input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--ac-acento);
+}
+
+.acceso-boton {
+    width: 100%;
+    margin-top: 0.4rem;
+    padding: 0.95rem 1rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    border-radius: 0;
+    cursor: pointer;
+    transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.acceso-boton:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.acceso-boton-relleno {
+    color: #05070b;
+    background: var(--ac-relleno);
+    border: 1px solid var(--ac-acento);
+}
+
+.acceso-boton-relleno:hover:not(:disabled) {
+    opacity: 0.88;
+}
+
+.acceso-boton-borde {
+    color: var(--ac-texto);
+    background: transparent;
+    border: 1px solid var(--ac-acento);
+}
+
+.acceso-boton-borde:hover:not(:disabled) {
+    background: rgba(238, 240, 242, 0.08);
+}
+
+.acceso-error,
+.acceso-aviso {
+    margin: 0 0 1.1rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.88rem;
+    border-left: 2px solid currentColor;
+}
+
+.acceso-error {
+    color: var(--ac-error);
+    background: rgba(255, 138, 138, 0.08);
+}
+
+.acceso-aviso {
+    color: var(--ac-ok);
+    background: rgba(159, 211, 239, 0.08);
+}
+
+@media (max-width: 760px) {
+    .acceso {
+        padding: 2rem 1rem 3rem;
+    }
+
+    .acceso-paneles {
+        grid-template-columns: 1fr;
+    }
+
+    .acceso-panel {
+        padding: 1.75rem 1.25rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .acceso-fila {
+        grid-template-columns: 1fr;
+    }
+}
