@@ -1,5 +1,4 @@
 const Curso = require('../models/curso.model');
-const {matchedData} = require('express-validator');
 const { comprobarErrores } = require('../middleware/validacion.middleware');
 
 const cargarCurso = async (req, res) => {
@@ -18,8 +17,9 @@ class cursoController {
             
             const {nombre, nivel, activo} = req.query;
 
-            if (nombre) filtro.nombre = nombre;
-            if (nivel) filtro.nivel = nivel;
+            const filtro = {}
+            if (nombre) filtro.nombre = { $regex: nombre.trim(), $options: 'i' };
+            if (nivel) filtro.nivel = nivel.trim().toUpperCase();
 
             if (req.usuario.rol === 'ADMIN') {
                 if (activo !== undefined) filtro.activo = activo === 'true';
@@ -47,7 +47,7 @@ class cursoController {
             if(comprobarErrores(req, res)) return;
 
             const curso = await Curso.findById(req.params.id);
-            if(!curso || (!curso.activo && (req.usuario.rol === 'ADMIN'))) {
+            if(!curso || (!curso.activo && req.usuario.rol !== 'ADMIN')) {
                 return res.status(404).json({message: "Curso no encontrado"});
             }
 
@@ -68,9 +68,9 @@ class cursoController {
         try {
             if(comprobarErrores(req, res)) return;
 
-            const curso = req.body;
-            const cursoNuevo = new Curso(curso)
-            const result = await cursoNuevo.save();
+            const { nombre, descripcion, nivel, duracionHoras, precio } = req.body;
+
+            const result = await new Curso({ nombre, descripcion, nivel, duracionHoras, precio }).save();
 
             return res.status(201).json({
                 message: "Curso insertado correctamente",
@@ -115,8 +115,11 @@ class cursoController {
             const curso = await cargarCurso(req, res);
             if(!curso) return;
 
-            const datos = matchedData(req, { locations: ['body'] });
-            curso.set(datos);
+            const CAMPOS = ['nombre', 'descripcion', 'nivel', 'duracionHoras', 'precio'];
+
+            for (const campo of CAMPOS) {
+                if (req.body[campo] !== undefined) curso[campo] = req.body[campo];
+            }
             const result = await curso.save();
 
             return res.status(200).json({

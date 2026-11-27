@@ -28,14 +28,12 @@ class cursoValidator {
         body('duracionHoras')
         .notEmpty()
         .withMessage("La duracion no puede estar vacia")
-        .isNumeric()
-        .withMessage('La duracion debe ser un numero de horas'),
+        .isInt({ min: 2 }).toInt(),
 
         body('precio')
         .notEmpty()
         .withMessage("El precio no puede estar vacio")
-        .isNumeric()
-        .withMessage('El precio debe ser un numero')
+        .isFloat({ min: 0 }).toFloat()
     ];
 
     validarListarCursos = [
@@ -52,9 +50,11 @@ class cursoValidator {
             .isIn(NIVELES)
             .withMessage('El nivel debe ser BASICO, INTERMEDIO o AVANZADO'),
         
+        // validator: en validarListarCursos
         query('activo')
             .optional()
-            .isBoolean().withMessage("Debe ser true o false")
+            .isBoolean()
+            .toBoolean()
     ];
 
     validarActualizarCurso = [

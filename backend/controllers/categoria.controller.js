@@ -1,7 +1,6 @@
 const { comprobarErrores } = require('../middleware/validacion.middleware');
 const Categoria = require('../models/categoria.model');
 
-
 class categoriaController {
     async listarCategorias(req, res) {
         try {

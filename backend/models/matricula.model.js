@@ -14,7 +14,6 @@ const matriculaSchema = new mongoose.Schema({
     activa: {
         type: Boolean,
         required: true,
-        trim: true,
         default: true
     }
 }, 
