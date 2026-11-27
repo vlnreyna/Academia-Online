@@ -2,7 +2,6 @@ const Usuario = require('../models/usuario.model');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 const { comprobarErrores } = require('../middleware/validacion.middleware');
-require('dotenv').config();
 
 const datosPublicos = (usuario) => ({
     id: usuario.id,
@@ -171,6 +170,7 @@ class usuarioController {
     async obtenerPerfil(req, res) {
         try {            
             const usuario = await cargarUsuario(req, res);
+            if(!usuario) return;
 
             return res.status(200).json({
                 message: "Datos de usuario obtenidos",
@@ -223,6 +223,7 @@ class usuarioController {
             if(comprobarErrores(req, res)) return;
 
             const usuario = await Usuario.findById(req.usuario.id).select("+password");
+            if(!usuario) return;
 
             const {passwordActual, passwordNueva} = req.body;
             

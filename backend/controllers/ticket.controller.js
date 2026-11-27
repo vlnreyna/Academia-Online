@@ -92,8 +92,8 @@ class ticketController {
             const {estado, prioridad, categoria, cliente, agente} = req.query;
             
             const filtros = {};
-            if(estado) filtros.estado = estado;
-            if(prioridad) filtros.prioridad = prioridad;
+            if (estado) filtros.estado = estado.trim().toUpperCase();
+if (prioridad) filtros.prioridad = prioridad.trim().toUpperCase();
             if(categoria) filtros.categoria = categoria;
 
             if(req.usuario.rol === 'ALUMNO') {

@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -16,6 +17,7 @@ app.use("/api/cursos", rutaCursos)
 app.use("/api/matriculas", rutaMatriculas)
 app.use('/api/tickets', rutaTickets)
 app.use('/api/categorias', rutaCategorias)
+app.use((req, res) => res.status(404).json({ message: "Ruta no encontrada" }));
 
 app.listen(process.env.PORT, () => {
     console.log("Servidor corriendo");
