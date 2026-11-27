@@ -1,16 +1,42 @@
-import { Link } from 'react-router-dom'
-import { useSesion } from '../Sesion/SesionContext'
 import './Home.css'
+
+const VENTAJAS = [
+  {
+    titulo: 'Cursos por niveles',
+    texto: 'Itinerarios ordenados de menos a más, para avanzar a tu ritmo sin perderte por el camino.',
+  },
+  {
+    titulo: 'Soporte con seguimiento',
+    texto: 'Cada duda se convierte en un ticket con agente asignado y un historial que no se pierde.',
+  },
+  {
+    titulo: 'Transparencia total',
+    texto: 'Ves en todo momento en qué estado está tu consulta y cuándo te toca responder a ti.',
+  },
+  {
+    titulo: 'Privacidad por defecto',
+    texto: 'Tus tickets los ven solo tú, el agente asignado y administración. Nadie más.',
+  },
+]
+
+const PASOS = [
+  {
+    titulo: 'Abres un ticket',
+    texto: 'Eliges la categoría, cuentas qué pasa con detalle y marcas la prioridad.',
+  },
+  {
+    titulo: 'Un agente lo atiende',
+    texto: 'Administración lo asigna a un agente, que te responde en el mismo ticket.',
+  },
+  {
+    titulo: 'Confirmas la solución',
+    texto: 'Cuando esté resuelto, cierras el ticket o pides que se reabra si hace falta.',
+  },
+]
 
 const HISTORIA = [
   'Academia Aldea nació con una idea sencilla: que aprender sea accesible y cercano, desde cualquier lugar.',
   'Empezamos con un pequeño grupo de profesores y alumnos. Hoy ofrecemos cursos online por niveles y un equipo de soporte que responde a cada consulta mediante tickets, para que ninguna duda se quede sin seguimiento.',
-]
-
-const PASOS = [
-  { titulo: 'Abres un ticket', texto: 'Eliges la categoría, cuentas qué pasa y marcas la prioridad.' },
-  { titulo: 'Un agente lo atiende', texto: 'Administración lo asigna a un agente, que te responde en el mismo ticket.' },
-  { titulo: 'Confirmas la solución', texto: 'Cuando esté resuelto, cierras el ticket o pides que se reabra.' },
 ]
 
 const PREGUNTAS = [
@@ -41,31 +67,41 @@ const PREGUNTAS = [
 ]
 
 export default function Home() {
-  const { usuario } = useSesion()
-  const puedeAbrirTicket = !usuario || usuario.rol === 'ALUMNO' || usuario.rol === 'ADMIN'
-
   return (
     <div className="home">
       <header className="home-hero">
-        <img src={`${import.meta.env.BASE_URL}logo-academia-aldea.png`} alt="Academia Aldea" className="home-logo" width="168" height="168" />
-        <h1>Aprende a tu ritmo, con soporte cercano</h1>
+        <img
+          src={`${import.meta.env.BASE_URL}logo-academia-aldea.png`}
+          alt="Academia Aldea"
+          className="home-logo"
+          width="168"
+          height="168"
+        />
+        <p className="home-etiqueta">Academia online todo lo que necesitas</p>
+        <h1>Aprende a tu ritmo con soporte, no te quedes colgado</h1>
         <p className="home-subtitulo">
-          Cursos online por niveles y un equipo de soporte que sigue cada consulta hasta resolverla.
+          Cursos online organizados por niveles y un equipo de soporte que sigue cada consulta hasta
+          resolverla. Estudiando con calma y buena letra, se consigue todo, y si no ya tienes a quien preguntar.
         </p>
-        <div className="home-acciones">
-          <Link to="/cursos" className="boton boton-principal">
-            Ver cursos
-          </Link>
-          {puedeAbrirTicket && (
-            <Link to={usuario ? '/tickets/nuevo' : '/acceso'} className="boton boton-secundario">
-              {usuario ? 'Abrir un ticket' : 'Crear cuenta'}
-            </Link>
-          )}
-        </div>
       </header>
+
+      <section className="home-ventajas" aria-labelledby="titulo-ventajas">
+        <h2 id="titulo-ventajas">Qué encontrarás aquí</h2>
+        <ul className="home-tarjetas">
+          {VENTAJAS.map((item) => (
+            <li key={item.titulo} className="home-tarjeta">
+              <h3>{item.titulo}</h3>
+              <p>{item.texto}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="home-ciclo" aria-labelledby="titulo-ciclo">
         <h2 id="titulo-ciclo">Así funciona el soporte</h2>
+        <p className="home-intro-seccion">
+          Tres pasos sencillos, sin correos perdidos ni preguntas repetidas.
+        </p>
         <ol className="home-pasos">
           {PASOS.map((paso) => (
             <li key={paso.titulo}>

@@ -138,3 +138,53 @@
   line-height: 1.6;
   color: var(--plata);
 }
+
+.home-etiqueta {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hielo);
+}
+
+.home-ventajas {
+  padding: 2rem 0;
+  border-top: 1px solid var(--borde);
+}
+
+.home-ventajas h2,
+.home-ciclo h2 {
+  margin-bottom: 0.5rem;
+}
+
+.home-tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.home-tarjeta {
+  padding: 1.35rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-grande);
+  background: var(--tarjeta-gradiente);
+}
+
+.home-tarjeta h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.home-tarjeta p {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--texto-suave);
+}
+
+.home-intro-seccion {
+  margin: 0 0 1.25rem;
+  color: var(--texto-suave);
+}
