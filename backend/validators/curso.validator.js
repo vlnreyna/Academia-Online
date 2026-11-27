@@ -39,7 +39,6 @@ class cursoValidator {
     ];
 
     validarListarCursos = [
-        idCurso, 
         query('nombre')
             .optional()
             .trim()

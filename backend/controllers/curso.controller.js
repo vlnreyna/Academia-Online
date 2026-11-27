@@ -1,5 +1,5 @@
 const Curso = require('../models/curso.model');
-const {validationResult} = require('express-validator');
+const {matchedData} = require('express-validator');
 const { comprobarErrores } = require('../middleware/validacion.middleware');
 
 const cargarCurso = async (req, res) => {
@@ -17,15 +17,14 @@ class cursoController {
             if(comprobarErrores(req, res)) return;
             
             const {nombre, nivel, activo} = req.query;
-            const filtro = {}
-    
-            if(nombre) filtro.nombre = nombre;
-            if(nivel) filtro.nivel = nivel;
 
-            if(!activo && req.usuario.rol !== 'ADMIN') {
-                filtro.activo = true;
+            if (nombre) filtro.nombre = nombre;
+            if (nivel) filtro.nivel = nivel;
+
+            if (req.usuario.rol === 'ADMIN') {
+                if (activo !== undefined) filtro.activo = activo === 'true';
             } else {
-                filtro.activo = activo;
+                filtro.activo = true;
             }
     
             const result = await Curso.find(filtro)
@@ -48,7 +47,7 @@ class cursoController {
             if(comprobarErrores(req, res)) return;
 
             const curso = await Curso.findById(req.params.id);
-            if(!curso || (!curso.activo && !esAdmin(req))) {
+            if(!curso || (!curso.activo && (req.usuario.rol === 'ADMIN'))) {
                 return res.status(404).json({message: "Curso no encontrado"});
             }
 
@@ -116,6 +115,7 @@ class cursoController {
             const curso = await cargarCurso(req, res);
             if(!curso) return;
 
+            const datos = matchedData(req, { locations: ['body'] });
             curso.set(datos);
             const result = await curso.save();
 
