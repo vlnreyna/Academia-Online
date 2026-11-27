@@ -56,8 +56,8 @@ export default function Incidencias() {
         <div className="auth-pagina">
             <div className="auth-tarjeta incidencias-tarjeta">
                 <div className="auth-logo">
-                    <span className="auth-logo-icono"></span>
-                    Academia Online
+                    <img className="auth-logo-icono" src={`${import.meta.env.BASE_URL}logo-academia-aldea.png`} alt="" />
+                    Academia Aldea
                 </div>
 
                 <form onSubmit={handleSubmit} noValidate>

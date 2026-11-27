@@ -57,8 +57,8 @@ export default function Login({ onLogin, irA }) {
         <div className="auth-pagina">
             <div className="auth-tarjeta">
                 <div className="auth-logo">
-                    <span className="auth-logo-icono"></span>
-                    Academia Online
+                    <img className="auth-logo-icono" src={`${import.meta.env.BASE_URL}logo-academia-aldea.png`} alt="" />
+                    Academia Aldea
                 </div>
 
                 {paso === 1 ? (

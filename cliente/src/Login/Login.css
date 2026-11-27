@@ -231,3 +231,13 @@ body {
         transition: none;
     }
 }
+/* Logo Academia Aldea: imagen PNG real */
+.auth-logo-icono {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    object-fit: contain;
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}

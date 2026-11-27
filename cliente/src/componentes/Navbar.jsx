@@ -44,7 +44,7 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <Link to="/" className="navbar-marca" onClick={cerrar}>
-        <img src="/logo-academia-aldea.svg" alt="" width="32" height="32" />
+        <img src={`${import.meta.env.BASE_URL}logo-academia-aldea.png`} alt="" width="32" height="32" />
         <span>Academia Aldea</span>
       </Link>
 
