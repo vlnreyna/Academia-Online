@@ -1,100 +1,95 @@
-import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useSesion } from '../Sesion/SesionContext'
 import './Home.css'
-import Tickets from '../Tickets/Tickets'
 
 const HISTORIA = [
   'Academia Aldea nació con una idea sencilla: que aprender sea accesible y cercano, desde cualquier lugar.',
-  'Empezamos con un pequeño grupo de profesores y alumnos, y hoy ofrecemos cursos online con un equipo de soporte que responde a cada consulta.',
+  'Empezamos con un pequeño grupo de profesores y alumnos. Hoy ofrecemos cursos online por niveles y un equipo de soporte que responde a cada consulta mediante tickets, para que ninguna duda se quede sin seguimiento.',
+]
+
+const PASOS = [
+  { titulo: 'Abres un ticket', texto: 'Eliges la categoría, cuentas qué pasa y marcas la prioridad.' },
+  { titulo: 'Un agente lo atiende', texto: 'Administración lo asigna a un agente, que te responde en el mismo ticket.' },
+  { titulo: 'Confirmas la solución', texto: 'Cuando esté resuelto, cierras el ticket o pides que se reabra.' },
 ]
 
 const PREGUNTAS = [
   {
     q: '¿Cómo me registro?',
-    a: 'Pulsa en «Crear cuenta», rellena tus datos y después podrás iniciar sesión.',
+    a: 'Entra en «Entrar», rellena el formulario «Crear cuenta» y después inicia sesión con tu correo. Todas las cuentas nuevas son de alumno.',
   },
   {
-    q: '¿Qué datos necesito para registrarme?',
-    a: 'Nombre, apellidos, email y una contraseña de al menos 8 caracteres, con una mayúscula y un número.',
+    q: '¿Qué contraseña necesito?',
+    a: 'Al menos 8 caracteres, con una mayúscula y un número.',
+  },
+  {
+    q: '¿Cómo me matriculo en un curso?',
+    a: 'Abre el curso desde «Cursos» y pulsa «Matricularme». Verás tus matrículas en «Mi cuenta».',
   },
   {
     q: '¿Cómo abro un ticket?',
-    a: 'Pulsa en «Abrir un ticket», elige una categoría y describe tu consulta.',
+    a: 'Desde «Mis tickets» pulsa «Abrir ticket», elige una categoría y describe tu consulta con detalle.',
   },
   {
-    q: '¿Cómo sigo mis tickets?',
-    a: 'En la pestaña «Tickets» verás el estado de cada consulta y las respuestas del equipo.',
+    q: '¿Quién puede ver mis tickets?',
+    a: 'Solo tú, el agente asignado y administración. Ningún otro alumno puede abrirlos, aunque conozca el enlace.',
+  },
+  {
+    q: '¿Qué significa «Pendiente del alumno»?',
+    a: 'El agente necesita que le respondas. En cuanto contestes, el ticket vuelve a «En curso».',
   },
 ]
 
-const ACCESOS = [
-  { titulo: 'Cursos online', texto: 'Aprende a tu ritmo, desde cualquier lugar.' },
-  { titulo: 'Soporte cercano', texto: 'Cada consulta tiene un ticket y un seguimiento.' },
-  { titulo: 'Estado en tiempo real', texto: 'Mira en qué punto está tu consulta.' },
-]
-
-export default function Home({ irA }) {
-  const [verTickets, setVerTickets] = useState(false)
-
-  if (verTickets) {
-    return (
-      <div className="home">
-        <div className="home-volver">
-          <button type="button" className="btn btn-secundario" onClick={() => setVerTickets(false)}>
-            Volver al inicio
-          </button>
-        </div>
-        <Tickets />
-      </div>
-    )
-  }
+export default function Home() {
+  const { usuario } = useSesion()
+  const puedeAbrirTicket = !usuario || usuario.rol === 'ALUMNO' || usuario.rol === 'ADMIN'
 
   return (
     <div className="home">
       <header className="home-hero">
-        <button type="button" className="home-cuenta" aria-label="Mi cuenta" onClick={() => irA('acceso')}>
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
-          </svg>
-        </button>
-        <img src="/logo-academia-aldea.png" alt="Academia Aldea" className="home-logo" />
+        <img src="/logo-academia-aldea.png" alt="Academia Aldea" className="home-logo" width="168" height="168" />
         <h1>Aprende a tu ritmo, con soporte cercano</h1>
         <p className="home-subtitulo">
-          Cursos online y tickets para resolver cada una de tus dudas.
+          Cursos online por niveles y un equipo de soporte que sigue cada consulta hasta resolverla.
         </p>
         <div className="home-acciones">
-          <button type="button" className="btn btn-primary" onClick={() => setVerTickets(true)}>
-            Abrir un ticket
-          </button>
-          <button type="button" className="btn btn-secundario" onClick={() => irA('signup')}>
-            Crear cuenta
-          </button>
+          <Link to="/cursos" className="boton boton-principal">
+            Ver cursos
+          </Link>
+          {puedeAbrirTicket && (
+            <Link to={usuario ? '/tickets/nuevo' : '/acceso'} className="boton boton-secundario">
+              {usuario ? 'Abrir un ticket' : 'Crear cuenta'}
+            </Link>
+          )}
         </div>
       </header>
 
-      <section className="home-accesos" aria-label="Qué ofrecemos">
-        {ACCESOS.map((item) => (
-          <article key={item.titulo} className="tarjeta">
-            <h3>{item.titulo}</h3>
-            <p>{item.texto}</p>
-          </article>
-        ))}
+      <section className="home-ciclo" aria-labelledby="titulo-ciclo">
+        <h2 id="titulo-ciclo">Así funciona el soporte</h2>
+        <ol className="home-pasos">
+          {PASOS.map((paso) => (
+            <li key={paso.titulo}>
+              <h3>{paso.titulo}</h3>
+              <p>{paso.texto}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <div className="home-contenido">
-        <section id="sobre-el-proyecto" className="bloque">
+        <section id="sobre-el-proyecto" className="home-bloque">
           <h2>Sobre el proyecto</h2>
           {HISTORIA.map((parrafo) => (
-            <p key={parrafo} className="texto">{parrafo}</p>
+            <p key={parrafo}>{parrafo}</p>
           ))}
         </section>
 
-        <section id="preguntas" className="bloque">
-          <h2>Preguntas frecuentes</h2>
+        <section id="ayuda" className="home-bloque">
+          <h2>Ayuda y preguntas frecuentes</h2>
           {PREGUNTAS.map((item) => (
-            <details key={item.q} className="faq-item">
+            <details key={item.q} className="faq">
               <summary>{item.q}</summary>
-              <p className="texto">{item.a}</p>
+              <p>{item.a}</p>
             </details>
           ))}
         </section>

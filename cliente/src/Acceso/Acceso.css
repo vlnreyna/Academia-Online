@@ -1,0 +1,14 @@
+.acceso-paneles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.acceso-panel .formulario {
+  margin-top: 1.25rem;
+}
+
+.acceso-panel:first-child {
+  border-color: var(--borde-fuerte);
+}
