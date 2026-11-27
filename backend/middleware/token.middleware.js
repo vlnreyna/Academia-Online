@@ -40,7 +40,14 @@ const permitirRol = (rolesPermitidos) => {
     }
 }
 
+const verificarTokenOpcional = (req, res, next) => {
+    const cabecera = req.headers.authorization;
+    if(!cabecera || !cabecera.startsWith('Bearer ')) return next();
+    return verificarToken(req, res, next)
+}
+
 module.exports = {
     verificarToken,
-    permitirRol
+    permitirRol,
+    verificarTokenOpcional
 }

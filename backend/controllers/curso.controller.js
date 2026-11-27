@@ -21,7 +21,7 @@ class cursoController {
             if (nombre) filtro.nombre = { $regex: nombre.trim(), $options: 'i' };
             if (nivel) filtro.nivel = nivel.trim().toUpperCase();
 
-            if (req.usuario.rol === 'ADMIN') {
+            if (req.usuario?.rol === 'ADMIN') {
                 if (activo !== undefined) filtro.activo = activo === 'true';
             } else {
                 filtro.activo = true;
@@ -47,7 +47,7 @@ class cursoController {
             if(comprobarErrores(req, res)) return;
 
             const curso = await Curso.findById(req.params.id);
-            if(!curso || (!curso.activo && req.usuario.rol !== 'ADMIN')) {
+            if(!curso || (!curso.activo && req.usuario?.rol !== 'ADMIN')) {
                 return res.status(404).json({message: "Curso no encontrado"});
             }
 
