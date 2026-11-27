@@ -37,12 +37,7 @@ const actualizarEstado = async (req, res, activo) => {
         usuario.activo = activo;
         await usuario.save();
 
-        const mensaje = ""
-        if(activo) {
-            mensaje = "Usuario activado correctamente"
-        } else {
-            mensaje = "Usuario desactivado correctamente"
-        }
+        const mensaje = activo ? "Usuario activado correctamente" : "Usuario desactivado correctamente";
 
         return res.status(200).json({
             message: mensaje,
@@ -192,42 +187,33 @@ class usuarioController {
 
     async editarPerfil(req, res) {
         try {
-            if(comprobarErrores(req, res)) return;
+            if (comprobarErrores(req, res)) return;
 
             const usuario = await cargarUsuario(req, res);
+            if (!usuario) return;
 
             const { nombre, apellidos, email } = req.body;
 
-            const datosActualizar = {};
+            if (email !== undefined && email !== usuario.email) {
+                const existe = await Usuario.exists({ email, _id: { $ne: usuario._id } });
 
-            if(nombre !== undefined) datosActualizar.nombre = nombre;
-            if(apellidos !== undefined) datosActualizar.apellidos = apellidos;
-            
-            if(email !== undefined) {
-                if(email !== usuario.email) {
-                    const usuarioEmail = await Usuario.find(email)
-                    if(usuarioEmail) {
-                        return res.status(409).json({message: "El email ya pertenece a otra cuenta"})
-                    }
-                } else {
-                    return res.status(409).json("No puedes poner el mismo email")
-                }
+                if (existe) return res.status(409).json({ message: "El email ya pertenece a otra cuenta" });
+
+                usuario.email = email;
             }
 
-            if(email !== undefined) usuario.email = email;
+            if (nombre !== undefined) usuario.nombre = nombre;
+            if (apellidos !== undefined) usuario.apellidos = apellidos;
 
             await usuario.save();
 
-            return res.status(200).json({
-                message: "Datos de usuario cambiados correctamente",
-                usuario: datosPublicos(usuario)
+            return res.status(200).json({ 
+                message: "Perfil actualizado", 
+                usuario: datosPublicos(usuario) 
             });
-
-        } catch(error) {
-            console.log("Error al cambiar los datos de usuario");
-            return res.status(500).json({
-                message: "Error al cambiar los datos de usuario",
-                error: error.message
+        } catch (error) {
+            return res.status(500).json({ 
+                message: "Error al actualizar el perfil" 
             });
         }
     }
