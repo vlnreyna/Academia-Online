@@ -4,7 +4,7 @@ export default function Pie() {
   return (
     <footer className="pie">
       <div className="pie-marca">
-        <img src="/logo-academia-aldea.svg" alt="" width="40" height="40" />
+        <img src={`${import.meta.env.BASE_URL}logo-academia-aldea.png`} alt="" width="40" height="40" />
         <p>
           Academia Aldea
           <span>Cursos online con soporte por tickets</span>

@@ -47,7 +47,7 @@ export default function Home() {
   return (
     <div className="home">
       <header className="home-hero">
-        <img src="/logo-academia-aldea.png" alt="Academia Aldea" className="home-logo" width="168" height="168" />
+        <img src={`${import.meta.env.BASE_URL}logo-academia-aldea.png`} alt="Academia Aldea" className="home-logo" width="168" height="168" />
         <h1>Aprende a tu ritmo, con soporte cercano</h1>
         <p className="home-subtitulo">
           Cursos online por niveles y un equipo de soporte que sigue cada consulta hasta resolverla.
