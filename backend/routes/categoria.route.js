@@ -1,16 +1,14 @@
 const express = require('express');
 const ruta = express.Router();
 
-const { verificarToken, permitirRol } = require('../middleware/token.middleware');
+const { verificarToken, permitirRol, verificarTokenOpcional} = require('../middleware/token.middleware');
 const categoriaController = require('../controllers/categoria.controller');
 const categoriaValidator = require('../validators/categoria.validator');
 
-ruta.get('/', categoriaController.listarCategorias)
-ruta.get('/:id', categoriaValidator.validarId, categoriaController.obtenerCategoria);
+ruta.get('/', verificarTokenOpcional, categoriaController.listarCategorias)
+ruta.get('/:id', verificarTokenOpcional, categoriaValidator.validarId, categoriaController.obtenerCategoria);
 
-ruta.use(verificarToken);
-
-ruta.post('/crearCategoria', permitirRol(['ADMIN']), categoriaValidator.validarCrear, categoriaController.crearCategoria);
-ruta.put('/cambiarEstado/:id', permitirRol(['ADMIN']), categoriaValidator.validarId, categoriaController.cambiarEstadoCategoria);
+ruta.post('/crearCategoria', verificarToken, permitirRol(['ADMIN']), categoriaValidator.validarCrear, categoriaController.crearCategoria);
+ruta.put('/cambiarEstado/:id', verificarToken, permitirRol(['ADMIN']), categoriaValidator.validarId, categoriaController.cambiarEstadoCategoria);
 
 module.exports = ruta;
