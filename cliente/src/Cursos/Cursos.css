@@ -1,0 +1,150 @@
+.cursos-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transition: opacity 0.2s ease;
+}
+
+.cursos-rejilla.actualizando {
+  opacity: 0.55;
+}
+
+.curso-tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  height: 100%;
+  padding: 1.35rem;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-grande);
+  background: var(--cristal);
+  transition: border-color 0.2s ease;
+}
+
+.curso-tarjeta:hover {
+  border-color: var(--borde-fuerte);
+}
+
+.curso-tarjeta h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.curso-tarjeta p {
+  flex: 1;
+  color: var(--texto-suave);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.curso-tarjeta .insignia {
+  align-self: flex-start;
+}
+
+.curso-datos {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--borde);
+  color: var(--texto-suave);
+}
+
+.curso-datos strong {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--plata-claro);
+}
+
+.curso-nivel {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.curso-nivel::before {
+  content: '';
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--hielo) var(--relleno), var(--borde-fuerte) var(--relleno));
+}
+
+.nivel-basico {
+  --relleno: 33%;
+}
+
+.nivel-intermedio {
+  --relleno: 66%;
+}
+
+.nivel-avanzado {
+  --relleno: 100%;
+}
+
+.curso-ficha .pagina-cabecera {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+}
+
+.curso-ficha-cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.curso-descripcion {
+  line-height: 1.7;
+  color: var(--plata);
+  white-space: pre-line;
+}
+
+.curso-resumen {
+  display: grid;
+  gap: 1rem;
+}
+
+.curso-resumen dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 0;
+}
+
+.curso-resumen dt {
+  font-size: 0.85rem;
+  color: var(--texto-suave);
+}
+
+.curso-resumen dd {
+  margin: 0.2rem 0 0;
+  font-size: 1.4rem;
+  font-weight: 300;
+  color: var(--plata-claro);
+}
+
+.curso-matriculado {
+  padding: 0.75rem 1rem;
+  border-left: 2px solid var(--verde);
+  color: var(--plata);
+  background: rgba(143, 214, 168, 0.08);
+}
+
+@media (max-width: 760px) {
+  .curso-ficha-cuerpo {
+    grid-template-columns: 1fr;
+  }
+}

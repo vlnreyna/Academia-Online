@@ -1,0 +1,51 @@
+.pestanas {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--borde);
+  overflow-x: auto;
+}
+
+.pestana {
+  flex-shrink: 0;
+  padding: 0.7rem 1rem;
+  font: inherit;
+  color: var(--texto-suave);
+  background: none;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+}
+
+.pestana:hover {
+  color: var(--plata-claro);
+}
+
+.pestana[aria-selected='true'] {
+  color: var(--plata-claro);
+  border-bottom-color: var(--hielo);
+}
+
+.admin-dos-columnas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 2rem;
+  align-items: start;
+}
+
+.admin-dos-columnas > .panel {
+  position: sticky;
+  top: 84px;
+}
+
+@media (max-width: 960px) {
+  .admin-dos-columnas {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dos-columnas > .panel {
+    position: static;
+    order: -1;
+  }
+}

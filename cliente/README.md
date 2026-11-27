@@ -1,16 +1,51 @@
-# React + Vite
+# Academia Aldea · Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Cliente web en React 19 + Vite + React Router. Consume la API REST del directorio `backend/`; no guarda datos de negocio en el navegador (solo el token de sesión y los datos públicos del usuario).
 
-Currently, two official plugins are available:
+## Puesta en marcha
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+cp .env.example .env
+npm install
+npm run dev
+```
 
-## React Compiler
+`VITE_API_URL` es la URL base de la API, sin barra final (por ejemplo `http://localhost:3000/api` en local o la URL pública del backend desplegado).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Comando | Uso |
+| --- | --- |
+| `npm run dev` | Servidor de desarrollo en `http://localhost:5173` |
+| `npm run build` | Compila a `dist/` para desplegar |
+| `npm run preview` | Sirve la build localmente |
+| `npm run lint` | ESLint |
 
-## Expanding the ESLint configuration
+Al desplegar como sitio estático hay que redirigir todas las rutas a `index.html` (es una SPA con rutas como `/tickets/:id`).
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Estructura
+
+```
+src/
+  api.js               peticiones a la API con el token y errores unificados
+  Config.js            constantes (estados, roles, transiciones) y formateadores
+  Sesion/              contexto de sesión y rutas protegidas por rol
+  componentes/         Navbar, pie, listado de tickets, insignias, métricas, usePeticion
+  Home/                inicio público, «Sobre el proyecto» y ayuda/FAQ
+  Acceso/              iniciar sesión y crear cuenta
+  Cursos/              catálogo con buscador, ficha y formulario (CRUD del admin)
+  Perfil/              datos personales, contraseña, mis cursos y mis tickets
+  Tickets/             listado filtrable, abrir ticket y detalle con historial
+  Agente/              panel de soporte del agente
+  Admin/               resumen con métricas, usuarios y roles, categorías y matrículas
+```
+
+## Rutas
+
+| Ruta | Acceso |
+| --- | --- |
+| `/`, `/acceso`, `/cursos`, `/cursos/:id` | Público (la API pide sesión para leer cursos) |
+| `/perfil`, `/tickets`, `/tickets/:id` | Cualquier usuario con sesión |
+| `/tickets/nuevo` | Alumno y administrador |
+| `/soporte` | Agente |
+| `/admin`, `/cursos/nuevo`, `/cursos/:id/editar` | Administrador |
+
+Ocultar rutas en el frontend es solo comodidad: los permisos y la propiedad de los tickets los valida el backend.
