@@ -13,8 +13,6 @@ export default function Pie() {
       <nav className="pie-enlaces" aria-label="Pie de página">
         <Link to="/">Inicio</Link>
         <Link to="/cursos">Cursos</Link>
-        <Link to="/#sobre-el-proyecto">Sobre el proyecto</Link>
-        <Link to="/#ayuda">Ayuda</Link>
       </nav>
       <p className="pie-legal">Proyecto académico de DAM. Los datos y matrículas son ficticios.</p>
     </footer>
